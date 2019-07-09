@@ -1,10 +1,9 @@
 var app = require('express')(),
     config = require('./config/index'),
-    database = require('./database/index')
     bodyParser = require('body-parser')
 
-const accessTokenDbHelper = require('./database/accessTokenDbHelper')(database)
-const userDbHelper = require('./database/userDbHelper')(database)
+const accessTokenDbHelper = require('./database/accessTokenDbHelper')()
+const userDbHelper = require('./database/userDbHelper')()
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

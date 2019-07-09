@@ -1,12 +1,8 @@
 var sqlWrapper = require('./sqlWrapper')
 var AccessTokenModel = require('./models/accessTokens')
+var DatabaseConnection = require('./databaseConnection')
 
-let databaseConnection
-
-module.exports = injectedDatabaseConnection => {
-
-  databaseConnection = injectedDatabaseConnection
-
+module.exports = () => {
   return {
     saveAccessToken: saveAccessToken,
     getUserIDFromBearerToken: getUserIDFromBearerToken
@@ -39,7 +35,7 @@ function saveAccessToken(token, clientID, userID, callback) {
 
 
   //execute the query to get the user
-  databaseConnection.query(getUserQuery, (err, result) => {
+  DatabaseConnection.query(getUserQuery, (err, result) => {
       //pass in the error which may be null and pass the results object which we get the user from if it is not null
       if (callback)
         callback(err, result)
@@ -59,17 +55,15 @@ function getUserIDFromBearerToken(bearerToken, callback){
   const getUserIDQuery = sqlWrapper.selectQueryMaker("*", "access_tokens", `access_token='${bearerToken}'`)
 
   //execute the query to get the userID
-  databaseConnection.query(getUserIDQuery, (err, result) => {
+  DatabaseConnection.query(getUserIDQuery, (err, result) => {
 
-    console.log('error : ', err)
+    console.log('error in get user id from bearer token: ', err + 'results', result)
 
       //get the userID from the results if its available else assign null
       let tokenObj = null
-      if (result && result.length){
 
+      if (result && result.length){
         const token = result[0]
-        // console.log('token in get token : ' + JSON.stringify(token))
-        console.log(token.access_token_expire)
         tokenObj = {
           accessToken: token.access_token,
           accessTokenExpiresAt: new Date(token.access_token_expire),
@@ -82,6 +76,7 @@ function getUserIDFromBearerToken(bearerToken, callback){
           }
         }
       }
+
       callback(tokenObj)
   })
 }
