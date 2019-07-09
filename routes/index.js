@@ -13,6 +13,6 @@ module.exports = (app) => {
 
 var configRoutes = ()=>{
     credentialRoutes.passExpressApp(expressApp)
-    expressApp.use('/', normalRoutes)
-    expressApp.use('/credintial', credentialRoutes.routes)
+    expressApp.use('/api', normalRoutes)
+    expressApp.use('/api/credential', credentialRoutes.routes)
 }

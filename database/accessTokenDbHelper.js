@@ -56,8 +56,7 @@ function saveAccessToken(token, clientID, userID, callback) {
 function getUserIDFromBearerToken(bearerToken, callback){
 
   //create query to get the userID from the row which has the bearerToken
-  const getUserIDQuery = sqlWrapper.selectQueryMaker("*", "access_token", `access_token='${bearerToken}'`)
-  // const getUserIDQuery = `SELECT * FROM access_tokens WHERE access_token = '${bearerToken}';`
+  const getUserIDQuery = sqlWrapper.selectQueryMaker("*", "access_tokens", `access_token='${bearerToken}'`)
 
   //execute the query to get the userID
   databaseConnection.query(getUserIDQuery, (err, result) => {

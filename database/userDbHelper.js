@@ -5,11 +5,10 @@ module.exports = injectedMySqlConnection => {
   databaseConnection = injectedMySqlConnection
 
   return {
-
    registerUserInDB: registerUserInDB,
    getUserFromCrentials: getUserFromCrentials,
    doesUserExist: doesUserExist
- }
+  }
 }
 
 /**
@@ -67,7 +66,6 @@ function getUserFromCrentials(username, password, callback) {
  *                   whether a user exists
  */
 function doesUserExist(username, callback) {
-
   //create query to check if the user already exists
   const doesUserExistQuery = `SELECT * FROM users WHERE username = '${username}'`
 

@@ -1,5 +1,11 @@
+/**
+ * requests from users including normal users and admins 
+ * are programmed in here.
+ */
+
 var express = require('express')
 var credintialRoutes = express()
+var authTypes = require('./../auth/authTypes')
 
 var OAuth2Server = require('oauth2-server'),
     Request = OAuth2Server.Request,
@@ -7,32 +13,17 @@ var OAuth2Server = require('oauth2-server'),
 
 let expressApp = null
 
-function authenticateRequest(req, res, next) {
-	var options = {
-		scope : "user",
-	}
-	var request = new Request(req);
-	var response = new Response(res);
-
-	return expressApp.oauth.authenticate(request, response, options)
-		.then(function(token) {
-			console.log(options)
-			next();
-		}).catch(function(err) {
-			console.log(options)
-			res.status(err.code || 500).json(err);
-		});
-}
-
-credintialRoutes.get('/', authenticateRequest, (req, res)=>{
-    res.send('/ route allowed')
+/**
+ * routes
+ */
+credintialRoutes.get('/', authTypes.userScopeAuthMiddleware, (req, res)=>{
+    res.send('/auth route allowed')
 })
-
-credintialRoutes.get('/user', authenticateRequest, (req, res)=>{
-    res.send('/user route allowed')
+credintialRoutes.get('/getProfile', authTypes.userScopeAuthMiddleware, (req, res)=>{
+	// todo getting profile
+	res.send('/user route allowed')
 })
-
-credintialRoutes.all('/token', obtainToken)
+credintialRoutes.post('/token', obtainToken)
 function obtainToken(req, res) {
 	var request = new Request(req);
 	var response = new Response(res);
@@ -46,6 +37,8 @@ function obtainToken(req, res) {
 			res.status(err.code || 500).json(err);
 		});
 }
+/*
+*/
 
 var passExpressApp = function(app){
 	expressApp = app

@@ -8,7 +8,7 @@ var config = {
 		],
 		redirectUris: []
 	}],
-	valid_scopes: ['free', 'user']
+	valid_scopes: ['user', 'admin']
 };
 
 let userDBHelper
