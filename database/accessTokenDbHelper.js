@@ -47,13 +47,39 @@ function saveAccessToken(token, clientID, userID, callback) {
 function getUserIDFromBearerToken(bearerToken, callback){
   const getUserIDQuery = sqlWrapper.selectQueryMaker("*", "access_tokens", `access_token='${bearerToken}'`)
 
-  return new Promise(function(resolve, reject){
-    DatabaseConnection.query(getUserIDQuery, (err, result) => {
-      if (err){
-        reject(err)
-      } else {
-        resolve(result)
-      }
-    })
+  // return new Promise(function(resolve, reject){
+  //   DatabaseConnection.query(getUserIDQuery, (err, result) => {
+  //     console.log('acc2')
+  //     if (err){
+  //       reject(err)
+  //     } else {
+  //       resolve(result)
+  //     }
+  //   })
+  // })
+
+  DatabaseConnection.query(getUserIDQuery).then(res=>{
+		var tokenObj = null
+		if (res && res.length){
+			const token = res[0]
+			let tokenObj = {
+			  accessToken: token.access_token,
+			  accessTokenExpiresAt: new Date(token.access_token_expire),
+			  scope: token.scope,
+			  client: {
+				id: token.client_id
+			  },
+			  user: {
+				id : token.user_id
+			  }
+			}
+      callback(false, tokenObj)
+    }else{
+      callback(true, null)
+		}
+  }).catch(err=>{
+    console.log('err' + err)
+    callback(true, null)
   })
+
 }

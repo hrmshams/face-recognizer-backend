@@ -33,31 +33,16 @@ module.exports = (injectedDBHelpers) => {
 
 var getAccessToken = function(bearerToken, callback) {
 
-	accessTokensDBHelper.getUserIDFromBearerToken(bearerToken)
-	.then(res=>{
-		let tokenObj = null
-		if (res && res.length){
-			const token = result[0]
-			tokenObj = {
-			  accessToken: token.access_token,
-			  accessTokenExpiresAt: new Date(token.access_token_expire),
-			  scope: token.scope,
-			  client: {
-				id: token.client_id
-			  },
-			  user: {
-				id : token.user_id
-			  }
-			}
-			return tokenObj
-		}else{
-			throw "null token object"
-		}
-	
-	})
-	.catch(err=>{
-		console.log('error happened in getAccessToken' + err)	
-	})
+	console.log('getaccessToken called bearer token : ' + bearerToken)
+	accessTokensDBHelper.getUserIDFromBearerToken(bearerToken, callback)
+
+
+	// return { accessToken: '2444cc3020b11d9d959cb7702345d645d303fad8',
+	// accessTokenExpiresAt: new Date('Fri Aug 09 2019 22:57:45 GMT+0430 (Iran Daylight Time)'),
+	// scope: 'user',
+	// client: { id: 'undefined' },
+	// user: { id: 2 } }
+
 };
 
 var getClient = function(clientId, clientSecret) {
