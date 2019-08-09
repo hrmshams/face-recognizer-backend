@@ -33,10 +33,30 @@ module.exports = (injectedDBHelpers) => {
 
 var getAccessToken = function(bearerToken, callback) {
 
-	//try and get the userID from the db using the bearerToken
-	accessTokensDBHelper.getUserIDFromBearerToken(bearerToken, (token) => {
-		//set the error to true if userID is null, and pass in the token if there is a userID else pass null
-		callback(token == null ? true : false, token == null ? null : token)
+	accessTokensDBHelper.getUserIDFromBearerToken(bearerToken)
+	.then(res=>{
+		let tokenObj = null
+		if (res && res.length){
+			const token = result[0]
+			tokenObj = {
+			  accessToken: token.access_token,
+			  accessTokenExpiresAt: new Date(token.access_token_expire),
+			  scope: token.scope,
+			  client: {
+				id: token.client_id
+			  },
+			  user: {
+				id : token.user_id
+			  }
+			}
+			return tokenObj
+		}else{
+			throw "null token object"
+		}
+	
+	})
+	.catch(err=>{
+		console.log('error happened in getAccessToken' + err)	
 	})
 };
 

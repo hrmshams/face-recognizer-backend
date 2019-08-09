@@ -22,10 +22,22 @@ function getUserFromCrentials(username, password, callback) {
   const getUserQuery = `SELECT * FROM users WHERE username = '${username}' AND password = SHA('${password}')`
   console.log('getUserFromCrentials query is: ', getUserQuery);
 
-  DatabaseConnection.query(getUserQuery, (err, result) => {
-      //pass in the error which may be null and pass the results object which we get the user from if it is not null
-      callback(false, result !== null && result.length  === 1 ?  result[0] : null)
+  DatabaseConnection.query(getUserQuery).then(res=>{
+    console.log('successfully got the user ', res)
+    callback(false, res !== null && res.length  === 1 ?  res[0] : null)
+
+  }).catch(err=>{
+    console.log('error in getUserFromCrentials : ', err)
+    callback(true, null)
   })
+
+  // DatabaseConnection.query(getUserQuery, (err, result) => {
+  //     //pass in the error which may be null and pass the results object which we get the user from if it is not null
+  //     console.log('error is : ' + err)
+  //     console.log('result is : ' + result)
+
+  //     callback(false, result !== null && result.length  === 1 ?  result[0] : null)
+  // })
 }
 
 

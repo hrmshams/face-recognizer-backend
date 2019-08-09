@@ -17,17 +17,18 @@ class DatabaseConnection {
     static query(queryStr, callback, notEndConnection){
         let con = DatabaseConnection.initConnection()
         con.connect()
-        con.query(queryStr, function(err, result, fields){
-            if (err){
-                console.log('error happened : '+ JSON.stringify(err))
-            } else {
-                console.log('successfully query executed, result: ' + result )
-            }
-            if (!notEndConnection)
-                con.end()
-        
-            if (callback !== undefined)
-                callback(err, result)
+
+        return new Promise( function(resolve, reject){
+            con.query(queryStr, function(err, result, fields){
+                if (!notEndConnection)
+                    con.end()
+
+                if (err){
+                    reject(err)
+                } else {
+                    resolve(result)
+                }
+            })    
         })
     }
     
