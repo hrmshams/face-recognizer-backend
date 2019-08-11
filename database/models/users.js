@@ -33,18 +33,22 @@ class Users extends Model {
     }
 
     registerUserInDB(username, password){
-
-        this.setValues([
-            username, 
-            SHA(`'${password}'`)
-        ])
-        this.save(true)
-        .then(res=>{
-            console.log('successfully query executed , res : ' + res)
+        let self = this
+        
+        return new Promise(function(resolve, reject){
+            self.setValues([
+                username, 
+                {val : `SHA('${password}')`, isStr : false} 
+            ])
+            self.save(false)
+            .then(res=>{
+                resolve(res)
+            })
+            .catch(err=>{
+                reject(err)
+            })    
+    
         })
-        .catch(err=>{
-            console.log('successfully query executed , err : ' + err)
-        })    
     }
       
 }

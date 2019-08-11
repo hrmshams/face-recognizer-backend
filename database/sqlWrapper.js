@@ -27,7 +27,11 @@ const insertQueryMaker = function(model, onDuplicate){
     query += ") VALUES ("
 
     for (let i=0; i<values.length; i++){
-        query += '"' + values[i] + '"' + ","
+        if (typeof(values[i]) === 'string')
+            query += '"' + values[i] + '"' + ","
+        else
+            query += values[i].val + ","
+
     }
     query = query.substring(0, query.length - 1);
     query += ")"

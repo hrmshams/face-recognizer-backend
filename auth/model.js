@@ -14,8 +14,6 @@ var config = {
 	valid_scopes: ['user', 'admin']
 };
 
-let userDBHelper
-// let accessTokensDBHelper
 module.exports = () => {
 	return ({
 		getAccessToken,

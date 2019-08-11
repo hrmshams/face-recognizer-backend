@@ -75,8 +75,9 @@ class Model {
             if (!self.values){
                 reject('no value has been set for inserting!')
             }
-            const getUserQuery = sqlWrapper.insertQueryMaker(self, on_duplicate)
-            DatabaseConnection.query(getUserQuery)
+            const insertQuery = sqlWrapper.insertQueryMaker(self, on_duplicate)
+            console.log(insertQuery)
+            DatabaseConnection.query(insertQuery)
             .then(res=>{
               resolve(res)
             })
