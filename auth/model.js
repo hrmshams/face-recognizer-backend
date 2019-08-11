@@ -1,3 +1,5 @@
+var AccessTokenModel = require('./../database/models/accessTokens')
+
 var config = {
 	clients: [{
 		id: 'application',	// TODO: Needed by refresh_token grant, because there is a bug at line 103 in https://github.com/oauthjs/node-oauth2-server/blob/v3.0.1/lib/grant-types/refresh-token-grant-type.js (used client.id instead of client.clientId)
@@ -12,10 +14,10 @@ var config = {
 };
 
 let userDBHelper
-let accessTokensDBHelper
+// let accessTokensDBHelper
 module.exports = (injectedDBHelpers) => {
 	userDBHelper = injectedDBHelpers.userDbHelper
-	accessTokensDBHelper = injectedDBHelpers.accessTokenDbHelper
+	// accessTokensDBHelper = injectedDBHelpers.accessTokenDbHelper
 	
 	return ({
 		getAccessToken,
@@ -34,15 +36,31 @@ module.exports = (injectedDBHelpers) => {
 var getAccessToken = function(bearerToken, callback) {
 
 	console.log('getaccessToken called bearer token : ' + bearerToken)
-	accessTokensDBHelper.getUserIDFromBearerToken(bearerToken, callback)
-
-
-	// return { accessToken: '2444cc3020b11d9d959cb7702345d645d303fad8',
-	// accessTokenExpiresAt: new Date('Fri Aug 09 2019 22:57:45 GMT+0430 (Iran Daylight Time)'),
-	// scope: 'user',
-	// client: { id: 'undefined' },
-	// user: { id: 2 } }
-
+	let accessTokenModel = new AccessTokenModel()
+	accessTokenModel.where('access_token','=',"'"+bearerToken+"'")
+	.then(res=>{
+		if (res && res.length){
+			const token = res[0]
+			let tokenObj = {
+			accessToken: token.access_token,
+			accessTokenExpiresAt: new Date(token.access_token_expire),
+			scope: token.scope,
+			client: {
+				id: token.client_id
+			},
+			user: {
+				id : token.user_id
+			}
+		}
+		callback(false, tokenObj)
+	}else{
+		callback(true, null)
+	}
+  
+	}).catch(err=>{
+	  console.log('err' + err)
+	  callback(true, null)
+	})
 };
 
 var getClient = function(clientId, clientSecret) {
@@ -61,8 +79,22 @@ var saveToken = function(token, client, user) {
 	console.log('saveAccessToken() called and accessToken is: ', token,' and client is: ',client, ' and user is: ', user)
   
 	//save the accessToken along with the user.id
-	accessTokensDBHelper.saveAccessToken(token, client.id, user.id)
-
+	let accessTokenModel = new AccessTokenModel()
+	accessTokenModel.setValues([
+		user.id, 
+		token.accessToken, 
+		token.accessTokenExpiresAt, 
+		token.clientId, 
+		token.scope
+	])
+	accessTokenModel.save(true)
+	.then(res=>{
+		console.log('successfully query executed , res : ' + res)
+	})
+	.catch(err=>{
+		console.log('successfully query executed , err : ' + err)
+	})
+  
 	return {
 		accessToken : token.accessToken,
 		accessTokenExpiresAt : token.accessTokenExpiresAt,

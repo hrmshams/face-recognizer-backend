@@ -58,8 +58,11 @@ const selectQueryMaker = function(selectedFields, tableName, conditionStr){
         return str
     }
     let selectedFieldsStr = createSelectedQuery(selectedFields)
-    let query = "SELECT " + selectedFieldsStr + " FROM " + tableName + " WHERE " + conditionStr
 
+    let query = "SELECT " + selectedFieldsStr + " FROM " + tableName + " WHERE " + conditionStr
+    if (!conditionStr)
+        query = "SELECT " + selectedFieldsStr + " FROM " + tableName
+    
     return query
 }
 

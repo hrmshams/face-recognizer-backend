@@ -1,4 +1,4 @@
-// var AccessTokensModel = require('./database/models/accessTokens')
+var AccessTokensModel = require('./database/models/accessTokens')
 // var sqlWrapper = require('./database/sqlWrapper')
 
 // accessTokenModel = new AccessTokensModel()
@@ -8,17 +8,19 @@
 
 // console.log(query2)
 
-const json = {
-    name : 'hamid',
-    lastname : 'shamc'
-}
+// const json = {
+//     name : 'hamid',
+//     lastname : 'shamc'
+// }
 
-let newJson = {
+// let newJson = {
 
-}
+// }
 
-for (j in json){
-    newJson[j] = '5'
-}
+// for (j in json){
+//     newJson[j] = '5'
+// }
 
-console.log(newJson)
+// console.log(newJson)
+
+// let a = new AccessTokensModel()

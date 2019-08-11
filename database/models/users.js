@@ -1,4 +1,4 @@
-var TableModel = require('./../model')
+var TableModel = require('./model')
 
 class Users extends TableModel {
     constructor(){
