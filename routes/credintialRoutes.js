@@ -16,7 +16,6 @@ let expressApp = null
  * routes
  */
 credintialRoutes.get('/', userScopeAuthMiddleware, (req, res)=>{
-	console.log('acc1')
     res.send('/auth route allowed')
 })
 credintialRoutes.get('/getProfile', userScopeAuthMiddleware, (req, res)=>{
@@ -35,7 +34,6 @@ function userScopeAuthMiddleware(req, res, next) {
 
 	return expressApp.oauth.authenticate(request, response, options)
 		.then(function(token) {
-			console.log('accesssss')
 			console.log(options)
 			next();
 		}).catch(function(err) {

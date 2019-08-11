@@ -2,14 +2,11 @@ var app = require('express')(),
     config = require('./config/index'),
     bodyParser = require('body-parser')
 
-// const accessTokenDbHelper = require('./database/accessTokenDbHelper')()
-const userDbHelper = require('./database/userDbHelper')()
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // database.migrate()
-var auth = require('./auth/index')(app, {userDbHelper})
+var auth = require('./auth/index')(app)
 var routes = require('./routes/index.js')(app, auth)
 routes.configRoutes()
 

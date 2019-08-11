@@ -101,10 +101,8 @@ class Model {
         })
     }
 
-    where(left, operator, right, coloums){
+    where(condition, coloums){
         // todo columns
-
-        let condition = left + operator + right
         const getUserIDQuery = sqlWrapper.selectQueryMaker("*", this.tableName, condition)
         console.log('query = ' + getUserIDQuery)
         return new Promise(function(resolve, reject){

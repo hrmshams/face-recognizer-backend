@@ -1,4 +1,5 @@
 var AccessTokenModel = require('./../database/models/accessTokens')
+var Users = require('./../database/models/users')
 
 var config = {
 	clients: [{
@@ -15,10 +16,7 @@ var config = {
 
 let userDBHelper
 // let accessTokensDBHelper
-module.exports = (injectedDBHelpers) => {
-	userDBHelper = injectedDBHelpers.userDbHelper
-	// accessTokensDBHelper = injectedDBHelpers.accessTokenDbHelper
-	
+module.exports = () => {
 	return ({
 		getAccessToken,
 		getClient,
@@ -37,24 +35,35 @@ var getAccessToken = function(bearerToken, callback) {
 
 	console.log('getaccessToken called bearer token : ' + bearerToken)
 	let accessTokenModel = new AccessTokenModel()
-	accessTokenModel.where('access_token','=',"'"+bearerToken+"'")
+	accessTokenModel.where(`access_token='${bearerToken}'`)
 	.then(res=>{
 		if (res && res.length){
 			const token = res[0]
 			let tokenObj = {
-			accessToken: token.access_token,
-			accessTokenExpiresAt: new Date(token.access_token_expire),
-			scope: token.scope,
-			client: {
-				id: token.client_id
-			},
-			user: {
-				id : token.user_id
+				accessToken: token.access_token,
+				accessTokenExpiresAt: new Date(token.access_token_expire),
+				scope: token.scope,
+				client: {
+					id: token.client_id
+				},
+				user: {
+					id : token.user_id
+				}
 			}
-		}
-		callback(false, tokenObj)
-	}else{
-		callback(true, null)
+			callback(false, tokenObj)
+		}else{
+			let tokenObj = {
+				accessToken: null,
+				accessTokenExpiresAt: new Date(),
+				scope: null,
+				client: {
+					id: null
+				},
+				user: {
+					id : null
+				}			
+			}
+			callback(false, tokenObj)
 	}
   
 	}).catch(err=>{
@@ -116,7 +125,17 @@ var getUser = function(username, password, callback) {
 	console.log('getUser() called and username is :'+ username + ' and password is :'+ password);
 
 	//try and get the user using the user's credentials
-	userDBHelper.getUserFromCrentials(username, password, callback)
+	let users = new Users()
+	users.where(`username = '${username}' AND password = SHA('${password}')`)
+	.then(res=>{
+		console.log('successfully got the user ', res)
+		callback(false, res !== null && res.length  === 1 ?  res[0] : null)
+  
+	}).catch(err=>{
+		console.log('error in getUserFromCrentials : ', err)
+		callback(true, null)
+	})
+  
 };
 
 function validateScope(user, client, scope) {

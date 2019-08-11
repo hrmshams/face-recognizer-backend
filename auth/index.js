@@ -1,7 +1,7 @@
 var OAuth2Server = require('oauth2-server')
 
-module.exports = (expressApp, dbHelpers) => {
-    let model = require('./model')(dbHelpers)
+module.exports = (expressApp) => {
+    let model = require('./model')()
 
     expressApp.oauth = new OAuth2Server({
         model: model,
