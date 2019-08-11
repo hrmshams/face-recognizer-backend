@@ -22,7 +22,7 @@ credintialRoutes.get('/getProfile', userScopeAuthMiddleware, (req, res)=>{
 	// todo getting profile
 	res.send('/user route allowed')
 })
-credintialRoutes.post('/token', obtainToken)
+credintialRoutes.post('/login', obtainToken)
 
 
 function userScopeAuthMiddleware(req, res, next) {

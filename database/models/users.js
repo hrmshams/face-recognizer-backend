@@ -38,7 +38,7 @@ class Users extends Model {
         return new Promise(function(resolve, reject){
             self.setValues([
                 username, 
-                {val : `SHA('${password}')`, isStr : false} 
+                {val : `SHA('${password}')`, noQuote : true}
             ])
             self.save(false)
             .then(res=>{

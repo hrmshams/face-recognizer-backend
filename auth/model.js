@@ -50,19 +50,19 @@ var getAccessToken = function(bearerToken, callback) {
 			}
 			callback(false, tokenObj)
 		}else{
-			let tokenObj = {
-				accessToken: null,
-				accessTokenExpiresAt: new Date(),
-				scope: null,
-				client: {
-					id: null
-				},
-				user: {
-					id : null
-				}			
-			}
-			callback(false, tokenObj)
-	}
+			// let tokenObj = {
+			// 	accessToken: null,
+			// 	accessTokenExpiresAt: new Date(),
+			// 	scope: -1,
+			// 	client: {
+			// 		id: null
+			// 	},
+			// 	user: {
+			// 		id : null
+			// 	}			
+			// }
+			callback(false, null)
+		}
   
 	}).catch(err=>{
 	  console.log('err' + err)
@@ -99,7 +99,7 @@ var saveToken = function(token, client, user) {
 		console.log('successfully query executed , res : ' + res)
 	})
 	.catch(err=>{
-		console.log('successfully query executed , err : ' + err)
+		console.log('error happened in query execution , err : ' + err)
 	})
   
 	return {
@@ -150,9 +150,10 @@ function validateScope(user, client, scope) {
 }
 
 function verifyScope(token, scope) {
-	console.log('verifyScope() called')
+	console.log('verifyScope() called token : ' + JSON.stringify(token))
 	if (!token.scope || !scope) {
-	  return false;
+		console.log('access in inner if')
+		return false;
 	}
 
 	let requestedScopes = scope.split(' ');
