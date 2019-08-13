@@ -15,22 +15,22 @@ class Users extends Model {
         }
     }
 
-    // doesUserExist(username) {
-    //     let self = this
-    //     return new Promise (function(resolve, reject){
-    //         self.where(`username = '${username}'`)
-    //         .then(res=>{
-    //             if (res.length > 0){
-    //                 resolve(true)
-    //             }else{
-    //                 resolve(false)
-    //             }
-    //         }).catch(err=>{
-    //             reject('error in getUserFromCrentials : ', err)
-    //         })
+    doesPersonExist(name) {
+        let self = this
+        return new Promise (function(resolve, reject){
+            self.where(`name = '${name}'`)
+            .then(res=>{
+                if (res.length > 0){
+                    resolve(true)
+                }else{
+                    resolve(false)
+                }
+            }).catch(err=>{
+                reject('error in geting user : ', err)
+            })
     
-    //     })
-    // }
+        })
+    }
 
 }
 
