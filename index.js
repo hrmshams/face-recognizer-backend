@@ -1,6 +1,10 @@
+var mainExpressApp = require('./routes/mainExpressApp')
+
 var app = require('express')(),
     config = require('./config/index'),
     bodyParser = require('body-parser')
+
+mainExpressApp.setMainExpressApp(app)
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

@@ -1,5 +1,3 @@
-let expressApp = null
-
 var normalRoutes = require('./normalRoutes')
 var credentialRoutes = require('./credintialRoutes.js')
 
@@ -11,7 +9,6 @@ module.exports = (app) => {
 }
 
 var configRoutes = ()=>{
-    credentialRoutes.passExpressApp(expressApp)
-    expressApp.use('/api/credential', credentialRoutes.routes)
+    expressApp.use('/api/credential', credentialRoutes)
     expressApp.use('/api', normalRoutes)
 }
