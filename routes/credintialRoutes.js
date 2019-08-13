@@ -1,3 +1,4 @@
+var peopleRoutes = require('./controllers/peopleController')
 /**
  * requests from users including normal users and admins 
  * are programmed in here.
@@ -15,16 +16,15 @@ let expressApp = null
 /**
  * routes
  */
+credintialRoutes.post('/login', obtainToken)
 credintialRoutes.get('/', userScopeAuthMiddleware, (req, res)=>{
     res.send('/auth route allowed')
 })
-credintialRoutes.get('/getProfile', userScopeAuthMiddleware, (req, res)=>{
-	// todo getting profile
-	res.send('/user route allowed')
-})
-credintialRoutes.post('/login', obtainToken)
+credintialRoutes.use('/people', peopleRoutes)
 
-
+/**
+ * 
+ */
 function userScopeAuthMiddleware(req, res, next) {
 	var options = {
 		scope : "user",
@@ -41,6 +41,24 @@ function userScopeAuthMiddleware(req, res, next) {
 			res.status(err.code || 500).json(err);
 		});
 }
+
+function adminScopeAuthMiddleware(req, res, next) {
+	var options = {
+		scope : "user admin",
+	}
+	var request = new Request(req);
+	var response = new Response(res);
+
+	return expressApp.oauth.authenticate(request, response, options)
+		.then(function(token) {
+			console.log(options)
+			next();
+		}).catch(function(err) {
+			console.log(options)
+			res.status(err.code || 500).json(err);
+		});
+}
+
 
 function obtainToken(req, res) {
 	var request = new Request(req);
@@ -62,9 +80,9 @@ var passExpressApp = function(app){
 	expressApp = app
 }
 
-module.exports = ()=>{
-    return {
-		routes : credintialRoutes,
-		passExpressApp : passExpressApp
-	}
+module.exports = {
+	routes : credintialRoutes,
+	passExpressApp : passExpressApp,
+	adminScopeAuthMiddleware,
+	userScopeAuthMiddleware
 }

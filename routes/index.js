@@ -1,11 +1,10 @@
 let expressApp = null
 
 var normalRoutes = require('./normalRoutes')
-var credentialRoutes = require('./credintialRoutes.js')()
+var credentialRoutes = require('./credintialRoutes.js')
 
 module.exports = (app) => {
     expressApp = app
-
     return {
         configRoutes,
     }
