@@ -1,0 +1,18 @@
+import sys
+import os
+from Database import Database
+from google_images_download import google_images_download   #importing the library
+response = google_images_download.googleimagesdownload()   #class instantiation
+
+db = Database()
+db.connect_db()
+
+result = db.where('people', 'is_crawled=0')
+for r in result:
+    arguments = {"keywords":r[1],"limit":1,"print_urls":False}
+    paths = response.download(arguments)
+
+    result = db.update('people', "id={0}".format(r[0]), "is_crawled=1")
+    print "PRINT_result of updating iscrawled {0}".format(result)
+    print "PRINT_crawling image for {0} is done".format(r[0])
+
