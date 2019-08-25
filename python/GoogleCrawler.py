@@ -9,10 +9,16 @@ db.connect_db()
 
 result = db.where('people', 'is_crawled=0')
 for r in result:
-    arguments = {"keywords":r[1],"limit":1,"print_urls":False}
+    arguments = {
+        "keywords":r[1],
+        "limit":1,
+        "print_urls":False,
+        "format": "jpg",
+        "size": "medium",
+    }
     paths = response.download(arguments)
 
-    result = db.update('people', "id={0}".format(r[0]), "is_crawled=1")
-    print "PRINT_result of updating iscrawled {0}".format(result)
-    print "PRINT_crawling image for {0} is done".format(r[0])
+    result = db.update ('people', "id={0}".format(r[0]), "is_crawled=1")
+    print ("PRINT_result of updating is crawled {0}".format(result))
+    print ("PRINT_crawling image for {0} is done".format(r[0]))
 

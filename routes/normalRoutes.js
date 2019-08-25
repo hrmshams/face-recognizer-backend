@@ -1,7 +1,6 @@
 var express = require('express')
 var normalRoutes = express()
 var users = new (require('./../database/models/users.js'))()
-var pythonAddress = require('./../python/addGetter')
 
 normalRoutes.get('/', (req, res)=>{
 	res.status(200).json({res : '/user route allowed'})
@@ -36,33 +35,6 @@ normalRoutes.post('/register', (req, res)=>{
             msg : 'internal error! : '+ error
         })
     })
-})
-
-var myPythonScriptPath = pythonAddress() + '/test.py';
-var {PythonShell} = require('python-shell');
-
-normalRoutes.post('/runp', (req, res)=>{
-    var pyshell = new PythonShell(myPythonScriptPath);
-    
-    pyshell.on('message', function (message) {
-        res.send(message)
-    });
-    
-    // end the input stream and allow the process to exit
-    pyshell.end(function (err) {
-        if (err){
-            throw err;
-        };
-    
-        console.log('python execution finished');
-    });
-})
-
-var fs = require('fs');
-normalRoutes.get('/getp', (req, res)=>{
-    fs.readFile('./../data/status.txt', function (err, data) {
-        res.end(data)
-    });
 })
 
 

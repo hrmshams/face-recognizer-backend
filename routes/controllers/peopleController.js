@@ -1,8 +1,18 @@
 var express = require('express')
 var peopleRoutes = express()
 var adminScopeAuthMiddleware = require('./../middlewares/authMiddlewares').adminScopeAuthMiddleware
+var pythonAddress = require('./../../python/addGetter')
 
 var people = new (require('../../database/models/people'))()
+
+/** related to crawling python script **/
+var myPythonScriptPath = pythonAddress() + '/GoogleCrawler.py';
+var {PythonShell} = require('python-shell');
+
+let options = {
+    pythonPath : "C:/Python27/python.exe",
+};
+/***************************************/
 
 peopleRoutes.post('/addPersonForCrowl', adminScopeAuthMiddleware, (req, res)=>{
     let {name} = req.body
@@ -38,5 +48,27 @@ peopleRoutes.post('/addPersonForCrowl', adminScopeAuthMiddleware, (req, res)=>{
     })
 
 })
+
+peopleRoutes.post('/crawlImages', adminScopeAuthMiddleware, (req, res)=>{
+    var pyshell = new PythonShell(myPythonScriptPath, options);
+    
+    pyshell.on('message', function (message) {
+        console.log(message)
+    });
+    
+    // end the input stream and allow the process to exit
+    pyshell.end(function (err) {
+        if (err){
+            throw err;
+        };
+        console.log('python execution finished');
+    });
+    res.json({
+        status : 1,
+        msg : 'running the google crawler script is successfully started'
+    })
+})
+
+
 
 module.exports = peopleRoutes
