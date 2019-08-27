@@ -46,7 +46,6 @@ peopleRoutes.post('/addPersonForCrowl', adminScopeAuthMiddleware, (req, res)=>{
             msg : "error happened in adding person2!" + e
         })
     })
-
 })
 
 peopleRoutes.post('/crawlImages', adminScopeAuthMiddleware, (req, res)=>{
