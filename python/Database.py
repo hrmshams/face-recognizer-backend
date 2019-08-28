@@ -1,9 +1,9 @@
 import mysql.connector
 
 class Database:
-    __username = "root"
-    __password = ""
-    __dbname = "faceMatcher"
+    __username = "hamid"
+    __password = "123"
+    __dbname = "facematcher"
     __host = '127.0.0.1'
 
     __cnx = None
