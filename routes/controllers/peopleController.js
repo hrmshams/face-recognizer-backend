@@ -10,7 +10,7 @@ var myPythonScriptPath = pythonAddress() + '/GoogleCrawler.py';
 var {PythonShell} = require('python-shell');
 
 let options = {
-    pythonPath : "C:/Python27/python.exe",
+    pythonPath : "/usr/bin/python3.6",
 };
 /***************************************/
 
