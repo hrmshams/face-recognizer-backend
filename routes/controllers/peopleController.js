@@ -1,7 +1,7 @@
 var express = require('express')
 var peopleRoutes = express()
 var adminScopeAuthMiddleware = require('./../middlewares/authMiddlewares').adminScopeAuthMiddleware
-var pythonAddress = require('./../../python/addGetter')
+var pythonAddress = require('./../../image_processing_core/addGetter')
 
 var people = new (require('../../database/models/people'))()
 
