@@ -1,4 +1,5 @@
 var peopleRoutes = require('./controllers/peopleController')
+var userRoutes = require('./controllers/userController')
 var expressApp = require('./mainExpressApp').getMainExpressApp()
 
 var userScopeAuthMiddleware = require('./middlewares/authMiddlewares').userScopeAuthMiddleware
@@ -39,7 +40,7 @@ credintialRoutes.get('/', userScopeAuthMiddleware, (req, res)=>{
     res.send('/auth route allowed')
 })
 credintialRoutes.use('/people', peopleRoutes)
-
+credintialRoutes.use('/user', userRoutes)
 
 function obtainToken(req, res) {
 	var request = new Request(req);
