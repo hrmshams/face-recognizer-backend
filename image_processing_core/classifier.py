@@ -40,16 +40,17 @@ from sklearn.pipeline import Pipeline
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import SVC
-from sklearn.grid_search import GridSearchCV
+from sklearn.model_selection import GridSearchCV
+# from sklearn.grid_search import GridSearchCV
+
 from sklearn.mixture import GMM
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
-modelDir = os.path.join(fileDir, '..', 'models')
+modelDir = os.path.join(fileDir, 'batch-represent', 'models')
 dlibModelDir = os.path.join(modelDir, 'dlib')
 openfaceModelDir = os.path.join(modelDir, 'openface')
-
 
 def getRep(imgPath, multiple=False):
     start = time.time()
@@ -214,7 +215,6 @@ if __name__ == '__main__':
         default=os.path.join(
             dlibModelDir,
             "shape_predictor_68_face_landmarks.dat"))
-
     parser.add_argument(
         '--networkModel',
         type=str,
@@ -222,22 +222,15 @@ if __name__ == '__main__':
         default=os.path.join(
             openfaceModelDir,
             'nn4.small2.v1.t7'))
-
     parser.add_argument('--imgDim', type=int,
                         help="Default image dimension.", default=96)
-
     parser.add_argument('--cuda', action='store_true')
-
     parser.add_argument('--verbose', action='store_true')
 
-    # 
     subparsers = parser.add_subparsers(dest='mode', help="Mode")
-
-    # 
     trainParser = subparsers.add_parser('train',
                                         help="Train a new classifier.")
     trainParser.add_argument('--ldaDim', type=int, default=-1)
-
     trainParser.add_argument(
         '--classifier',
         type=str,
@@ -251,13 +244,11 @@ if __name__ == '__main__':
             'DBN'],
         help='The type of classifier to use.',
         default='LinearSvm')
-
     trainParser.add_argument(
         'workDir',
         type=str,
         help="The input work directory containing 'reps.csv' and 'labels.csv'. Obtained from aligning a directory with 'align-dlib' and getting the representations with 'batch-represent'.")
 
-    # 
     inferParser = subparsers.add_parser(
         'infer', help='Predict who an image contains from a trained classifier.')
     inferParser.add_argument(
