@@ -51,6 +51,27 @@ class Users extends Model {
         })
     }
       
+    isUserAdmin(username) {
+		console.log('aaaaaaaaaaaaaaaa')
+        let self = this
+        return new Promise (function(resolve, reject){
+            self.where(`username = '${username}'`)
+            .then(res=>{
+                if (res.length > 0){
+                    if (res[0].is_admin === 1)
+                        resolve(true)
+                    else
+                        resolve(false)
+                }else{
+                    resolve(-1)
+                }
+            }).catch(err=>{
+                reject('error in getUserFromCrentials : ', err)
+            })
+    
+        })
+    }
+
 }
 
 module.exports = Users

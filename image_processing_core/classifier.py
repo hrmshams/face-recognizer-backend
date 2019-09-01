@@ -78,6 +78,7 @@ def preProcess(imgPath, saves):
         # TODO return a proper value
 
     if (saves):
+        # todo
         cv2.imwrite("annotated.png", alignedFace)
     
     return alignedFace
