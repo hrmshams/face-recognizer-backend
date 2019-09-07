@@ -4,6 +4,9 @@ var app = require('express')(),
     config = require('./config/index'),
     bodyParser = require('body-parser')
 
+var cors = require('cors')
+app.use(cors({credentials: true, origin: true}))
+
 mainExpressApp.setMainExpressApp(app)
 
 app.use(bodyParser.urlencoded({ extended: true }));

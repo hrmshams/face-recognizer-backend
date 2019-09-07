@@ -11,7 +11,8 @@ class Users extends Model {
         return {
             id : [Model.types.int, Model.properties.notNull, Model.properties.autoIncrement],
             username : [Model.types.varchar, Model.properties.notNull],
-            password : [Model.types.varchar, Model.properties.notNull]
+            password : [Model.types.varchar, Model.properties.notNull],
+            is_admin : [Model.types.bool, Model.properties.notNull],
         }
     }
 
@@ -37,8 +38,9 @@ class Users extends Model {
         
         return new Promise(function(resolve, reject){
             self.setValues([
-                username, 
-                {val : `SHA('${password}')`, noQuote : true}
+                username,
+                {val : `SHA('${password}')`, noQuote : true},
+                0
             ])
             self.save(false)
             .then(res=>{
@@ -46,7 +48,7 @@ class Users extends Model {
             })
             .catch(err=>{
                 reject(err)
-            })    
+            })
     
         })
     }

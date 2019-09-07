@@ -8,7 +8,8 @@ class Model {
     static get types(){
         return {
             int : "int",
-            varchar : "varchar(255)"
+            varchar : "varchar(255)",
+            bool : "bool"
         }
     } 
     static get properties() {

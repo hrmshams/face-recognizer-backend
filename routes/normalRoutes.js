@@ -23,6 +23,7 @@ normalRoutes.post('/register', (req, res)=>{
                     msg : 'user successfully registered'
                 })
             }).catch(error=>{
+                console.log('ac1' + error)
                 res.status(500).json({
                     res : -1,
                     msg : 'error in registering user happened!' + error
@@ -30,6 +31,7 @@ normalRoutes.post('/register', (req, res)=>{
             })
         }
     }).catch(error=>{
+        console.log('ac2')
         res.status(500).json({
             res : -1,
             msg : 'internal error! : '+ error
