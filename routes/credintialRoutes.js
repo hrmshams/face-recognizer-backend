@@ -63,7 +63,7 @@ credintialRoutes.get('/getUser', function(req, res, next) {
 				msg : 'user doesnt exist' 
 			})
 		}else {
-			res.status(200).json(response)
+			res.status(200).json({...response, ...req.token})
 		}
 	}).catch(function(err){
 		res.status(200).json({

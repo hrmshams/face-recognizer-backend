@@ -16,33 +16,34 @@ let options = {
 
 peopleRoutes.post('/addPersonForCrowl', adminScopeAuthMiddleware, (req, res)=>{
     let {name} = req.body
-
     people.doesPersonExist(name).then(r=>{
         if (r === false){
             people.setValues([
                 name,
-                false
+                0
             ])
             people.save().then(r=>{
                 res.status(200).json({
-                    res : 1,
+                    status : 1,
                     msg : "person successfully added!"
                 })
             }).catch(e=>{
+                let msg = "error happened in adding person!" + e
+                console.log(msg)
                 res.status(500).json({
-                    res : -1,
-                    msg : "error happened in adding person!" + e
+                    status : -1,
+                    msg : msg
                 })
             })
         }else{
             res.status(200).json({
-                res : 0,
+                status : 0,
                 msg : "there exist this name already" 
             })
         }
     }).catch(e =>{
         res.status(500).json({
-            res : -1,
+            status : -1,
             msg : "error happened in adding person2!" + e
         })
     })
