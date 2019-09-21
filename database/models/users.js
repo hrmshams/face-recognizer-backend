@@ -54,7 +54,6 @@ class Users extends Model {
     }
       
     isUserAdmin(username) {
-		console.log('aaaaaaaaaaaaaaaa')
         let self = this
         return new Promise (function(resolve, reject){
             self.where(`username = '${username}'`)

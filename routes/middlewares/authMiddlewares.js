@@ -13,7 +13,7 @@ const userScopeAuthMiddleware = function(req, res, next) {
 
     return expressApp.oauth.authenticate(request, response, options)
         .then(function(token) {
-            console.log(options)
+            console.log(token)
             next();
         }).catch(function(err) {
             console.log(options)

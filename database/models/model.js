@@ -77,7 +77,6 @@ class Model {
                 reject('no value has been set for inserting!')
             }
             const insertQuery = sqlWrapper.insertQueryMaker(self, on_duplicate)
-            console.log(insertQuery)
             DatabaseConnection.query(insertQuery)
             .then(res=>{
               resolve(res)
@@ -106,7 +105,6 @@ class Model {
     where(condition, coloums){
         // todo columns
         const getUserIDQuery = sqlWrapper.selectQueryMaker("*", this.tableName, condition)
-        console.log('query = ' + getUserIDQuery)
         return new Promise(function(resolve, reject){
             DatabaseConnection.query(getUserIDQuery)
             .then(res=>{

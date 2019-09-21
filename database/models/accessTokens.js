@@ -7,8 +7,6 @@ class AccessTokens extends Model {
         this.model = this.setModel()
         this.key = "user_id"
         this.keyIndex = 0
-
-        console.log('access to constructor')
     }
 
     // (user_id, access_token, access_token_expire, client_id, scope)

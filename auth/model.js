@@ -31,7 +31,7 @@ module.exports = () => {
 
 var getAccessToken = function(bearerToken, callback) {
 
-	console.log('getaccessToken called bearer token : ' + bearerToken)
+	// console.log('getaccessToken called bearer token : ' + bearerToken)
 	let accessTokenModel = new AccessTokenModel()
 	accessTokenModel.where(`access_token='${bearerToken}'`)
 	.then(res=>{
@@ -72,7 +72,7 @@ var getAccessToken = function(bearerToken, callback) {
 
 var getClient = function(clientId, clientSecret) {
 
-	console.log('getClient() called')
+	// console.log('getClient() called')
 	var clients = config.clients.filter(function(client) {
 
 		return client.clientId === clientId && client.clientSecret === clientSecret;
@@ -83,7 +83,7 @@ var getClient = function(clientId, clientSecret) {
 
 var saveToken = function(token, client, user) {
 
-	console.log('saveAccessToken() called and accessToken is: ', token,' and client is: ',client, ' and user is: ', user)
+	// console.log('saveAccessToken() called and accessToken is: ', token,' and client is: ',client, ' and user is: ', user)
   
 	//save the accessToken along with the user.id
 	let accessTokenModel = new AccessTokenModel()
@@ -96,7 +96,7 @@ var saveToken = function(token, client, user) {
 	])
 	accessTokenModel.save(true)
 	.then(res=>{
-		console.log('successfully query executed , res : ' + res)
+		// console.log('successfully query executed , res : ' + res)
 	})
 	.catch(err=>{
 		console.log('error happened in query execution , err : ' + err)
@@ -120,13 +120,13 @@ var saveToken = function(token, client, user) {
  */
 
 var getUser = function(username, password, callback) {
-	console.log('getUser() called and username is :'+ username + ' and password is :'+ password);
+	// console.log('getUser() called and username is :'+ username + ' and password is :'+ password);
 
 	//try and get the user using the user's credentials
 	let users = new Users()
 	users.where(`username = '${username}' AND password = SHA('${password}')`)
 	.then(res=>{
-		console.log('successfully got the user ', res)
+		// console.log('successfully got the user ', res)
 		callback(false, res !== null && res.length  === 1 ?  res[0] : null)
   
 	}).catch(err=>{
@@ -137,7 +137,7 @@ var getUser = function(username, password, callback) {
 };
 
 function validateScope(user, client, scope) {
-	console.log('validateScope() called and requested scope in validate : ' + scope)
+	// console.log('validateScope() called and requested scope in validate : ' + scope)
 	if (!scope){
 		return false
 	}
@@ -150,9 +150,8 @@ function validateScope(user, client, scope) {
 }
 
 function verifyScope(token, scope) {
-	console.log('verifyScope() called token : ' + JSON.stringify(token))
+	// console.log('verifyScope() called token : ' + JSON.stringify(token))
 	if (!token.scope || !scope) {
-		console.log('access in inner if')
 		return false;
 	}
 
@@ -160,7 +159,7 @@ function verifyScope(token, scope) {
 	let authorizedScopes = token.scope.split(' ');
 	var result = requestedScopes.every(s => authorizedScopes.indexOf(s) >= 0)
 
-	console.log('requested scope : ' + scope + " - and the result : " + result)
+	// console.log('requested scope : ' + scope + " - and the result : " + result)
 	return result;
 }
 

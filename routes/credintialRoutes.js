@@ -39,6 +39,24 @@ credintialRoutes.post('/login', (req, res, next)=> {
 credintialRoutes.get('/', userScopeAuthMiddleware, (req, res)=>{
     res.send('/auth route allowed')
 })
+
+credintialRoutes.get('/getUser', function(req, res, next) {
+	// var options = {
+	//     scope : "user",
+	// }
+	var request = new Request(req);
+	var response = new Response(res);
+ 
+	return expressApp.oauth.authenticate(request, response)
+	    .then(function(token) {
+			console.log(token)
+			res.status(200).json(token)
+		}).catch(function(err) {
+			console.log(err)
+			res.status(err.code || 500).json(err);
+		});
+})
+
 credintialRoutes.use('/people', peopleRoutes)
 credintialRoutes.use('/user', userRoutes)
 
@@ -50,6 +68,7 @@ function obtainToken(req, res) {
 	.then(function(token) {
 		res.json(token);
 	}).catch(function(err) {
+		console.log('ac to th : ' + err.code + " - " + err)
 		res.status(err.code || 500).json(err);
 	});
 }
