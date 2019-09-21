@@ -50,11 +50,26 @@ credintialRoutes.get('/getUser', function(req, res, next) {
 	return expressApp.oauth.authenticate(request, response)
 	    .then(function(token) {
 			console.log(token)
-			res.status(200).json(token)
+			req.token = token
+			next()
 		}).catch(function(err) {
 			console.log(err)
 			res.status(err.code || 500).json(err);
 		});
+}, function(req, res){
+	users.getUser(req.token.user.id).then(function(response){
+		if (response === -1){
+			res.status(200).json({
+				msg : 'user doesnt exist' 
+			})
+		}else {
+			res.status(200).json(response)
+		}
+	}).catch(function(err){
+		res.status(200).json({
+			msg : 'not authenticated'
+		})
+	})
 })
 
 credintialRoutes.use('/people', peopleRoutes)

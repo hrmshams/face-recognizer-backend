@@ -7,7 +7,7 @@ module.exports = (expressApp) => {
         model: model,
 
         // WARNING : WHAT ARE TWO NEXT ARGUMENTS?
-        accessTokenLifetime: 60 * 60, 
+        accessTokenLifetime: 24 * 60 * 60, 
         allowBearerTokensInQueryString: true
     });
 }
