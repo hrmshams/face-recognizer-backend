@@ -89,12 +89,14 @@ class Model {
     }
 
     all(){
-        const getUserIDQuery = sqlWrapper.selectQueryMaker("*", this.tableName)
+        const getAllRecordsQuery = sqlWrapper.selectQueryMaker("*", this.tableName)
         
+        console.log(getAllRecordsQuery)
+
         return new Promise(function(resolve, reject){
-            DatabaseConnection.query(getUserIDQuery)
+            DatabaseConnection.query(getAllRecordsQuery)
             .then(res=>{
-                resolve()
+                resolve(res)
             })
             .catch(err=>{
                 reject(err)

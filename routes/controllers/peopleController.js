@@ -69,6 +69,46 @@ peopleRoutes.post('/crawlImages', adminScopeAuthMiddleware, (req, res)=>{
     })
 })
 
+peopleRoutes.get('/getPeople', adminScopeAuthMiddleware, (req, res)=>{
+    let p_crawled = people.getPeople(1)
+    let p_not_crawled = people.getPeople(0)
+
+    Promise.all([p_not_crawled, p_crawled]).then(function(vals){
+        if (vals && (vals[0].length>0 || vals[1].length>0)){
+            res.status(200).json({
+                status : 1,
+                not_crawled : vals[0], 
+                crawled : vals[1], 
+            })
+        }else{
+            res.status(200).json({
+                status : 0,
+                msg : 'there is no record!'
+            })
+        }
+    }).catch(function(err){
+        console.log(err)
+    })
+    // people.all().then(r=>{
+    //     if (r && r.length>0){
+    //         res.status(200).json({
+    //             status : 1,
+    //             people : r
+    //         })
+    //     }else{
+    //         res.status(200).json({
+    //             status : 0,
+    //             msg : 'there is no record!'
+    //         })
+    //     }
+    // }).catch(e =>{
+    //     res.status(200).json({
+    //         status : -1,
+    //         msg : "some error in server" + e
+    //     })
+    // })
+})
+
 
 
 module.exports = peopleRoutes

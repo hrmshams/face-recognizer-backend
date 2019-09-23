@@ -32,6 +32,18 @@ class Users extends Model {
         })
     }
 
+    getPeople(is_crawled) {
+        let self = this
+        return new Promise (function(resolve,reject){
+            self.where(`is_crawled='${is_crawled}'`)
+        .then(res=>{
+            resolve(res)
+        }).catch(err=>{
+            reject(err)
+        })
+        })
+    }
+
 }
 
 module.exports = Users
