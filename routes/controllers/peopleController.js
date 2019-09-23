@@ -24,10 +24,19 @@ peopleRoutes.post('/addPersonForCrowl', adminScopeAuthMiddleware, (req, res)=>{
                 0
             ])
             people.save().then(r=>{
-                res.status(200).json({
-                    status : 1,
-                    msg : "person successfully added!"
+                people.where('is_crawled=0').then(r=>{
+                    res.status(200).json({
+                        status : 2,
+                        msg : "person successfully added!",
+                        uncrawledPeople : r
+                    })
+                }).catch(err=>{
+                    res.status(200).json({
+                        status : 1,
+                        msg : "person successfully added but couldn't get data!" + err
+                    })
                 })
+
             }).catch(e=>{
                 let msg = "error happened in adding person!" + e
                 console.log(msg)
@@ -85,13 +94,15 @@ peopleRoutes.post('/crawlImages', adminScopeAuthMiddleware, (req, res)=>{
 peopleRoutes.get('/getPeople', adminScopeAuthMiddleware, (req, res)=>{
     let p_crawled = people.getPeople(1)
     let p_not_crawled = people.getPeople(0)
+    let is_crawling = status.all()
 
-    Promise.all([p_not_crawled, p_crawled]).then(function(vals){
+    Promise.all([p_not_crawled, p_crawled, is_crawling]).then(function(vals){
         if (vals && (vals[0].length>0 || vals[1].length>0)){
             res.status(200).json({
                 status : 1,
-                not_crawled : vals[0], 
-                crawled : vals[1], 
+                not_crawled : vals[0],
+                crawled : vals[1],
+                is_crawling : vals[2][0].is_crawling
             })
         }else{
             res.status(200).json({
