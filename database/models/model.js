@@ -119,6 +119,20 @@ class Model {
 
     }
 
+    update(condition, new_values){
+        let query = `UPDATE ${this.tableName} SET ${new_values} WHERE ${condition};`
+        console.log(query)
+        return new Promise(function(resolve, reject){
+            DatabaseConnection.query(query)
+            .then(res=>{
+                resolve(res)
+            })
+            .catch(err=>{
+                reject(err)
+            })
+        })        
+    }
+
 }
 
 module.exports = Model

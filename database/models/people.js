@@ -1,6 +1,6 @@
 var Model = require('./model')
 
-class Users extends Model {
+class People extends Model {
     constructor(){
         super("people")
 
@@ -46,4 +46,4 @@ class Users extends Model {
 
 }
 
-module.exports = Users
+module.exports = People

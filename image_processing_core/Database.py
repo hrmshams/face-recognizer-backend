@@ -132,6 +132,7 @@ class Database:
 
     def update(self, table_name, condition, new_value):
         query = "UPDATE {0} SET {1} WHERE {2};".format(table_name,new_value,condition)
+        print (query)
         cursor = self.__cnx.cursor()    
 
         try:

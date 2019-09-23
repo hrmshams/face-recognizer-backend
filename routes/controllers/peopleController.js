@@ -4,6 +4,7 @@ var adminScopeAuthMiddleware = require('./../middlewares/authMiddlewares').admin
 var pythonAddress = require('./../../image_processing_core/addGetter')
 
 var people = new (require('../../database/models/people'))()
+var status = new (require('../../database/models/status'))()
 
 /** related to crawling python script **/
 var myPythonScriptPath = pythonAddress() + '/GoogleCrawler.py';
@@ -52,6 +53,13 @@ peopleRoutes.post('/addPersonForCrowl', adminScopeAuthMiddleware, (req, res)=>{
 peopleRoutes.post('/crawlImages', adminScopeAuthMiddleware, (req, res)=>{
     var pyshell = new PythonShell(myPythonScriptPath, options);
     
+    // status.all().then(r=>{
+    //     console.log(r)
+    //     res.json(r)
+    // }).catch(e=>{
+    //     res.json(e)
+    // })
+
     pyshell.on('message', function (message) {
         console.log(message)
     });
@@ -61,7 +69,12 @@ peopleRoutes.post('/crawlImages', adminScopeAuthMiddleware, (req, res)=>{
         if (err){
             throw err;
         };
-        console.log('python execution finished');
+        console.log('python crawling script finished');
+        status.update('is_crawling=1', 'is_crawling=0').then(res=>{
+            console.log('successfully changes the status : ', res)
+        }).catch(err=>{
+            console.log('couldnt change the status : ', err)
+        })
     });
     res.json({
         status : 1,

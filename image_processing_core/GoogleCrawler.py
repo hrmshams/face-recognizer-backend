@@ -7,6 +7,8 @@ response = google_images_download.googleimagesdownload()   #class instantiation
 db = Database()
 db.connect_db()
 
+db.update('status', 'is_crawling=0', 'is_crawling=1')
+
 result = db.where('people', 'is_crawled=0')
 for r in result:
     arguments = {
@@ -22,3 +24,5 @@ for r in result:
     print ("PRINT_result of updating is crawled {0}".format(result))
     print ("PRINT_crawling image for {0} is done".format(r[0]))
 
+# print ("PRINT_access")
+# db.update('status', 'is_crawling=1', 'is_crawling=0')
