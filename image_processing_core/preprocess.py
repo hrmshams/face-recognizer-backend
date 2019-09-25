@@ -3,6 +3,8 @@ import openface
 import os
 import argparse
 
+from Database import Database
+
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, 'batch-represent', 'models')
 dlibModelDir = os.path.join(modelDir, 'dlib')
@@ -37,15 +39,21 @@ def preProcess(imgPath, saves=False, pathToSave=""):
 
     if (saves):
         cv2.imwrite(pathToSave, alignedFace)
+
     
     return alignedFace
 
-def createPaths():
-    prefix = '../downloads'
-    people = os.listdir(prefix)
+def createPaths(people):
+    prefix = 'downloads'
+
+    desiredPeople = []
+    for p in people:
+        pathToExamine = prefix + "/" + p
+        if (os.path.isdir(pathToExamine) == True):
+            desiredPeople.append(p)
 
     paths = {}
-    for p in people:
+    for p in desiredPeople:
         personImagesList = os.listdir(prefix + '/' + p)
 
         paths[p] = []
@@ -56,13 +64,13 @@ def createPaths():
 
     return paths
 
-def doPreprocessing():
-    paths = createPaths()
+def doPreprocessing(unpreprocessedProple):
+    paths = createPaths(unpreprocessedProple)
     for person in paths:
         imagesPaths = paths[person]
         for i in range(0, len(imagesPaths)):
-            folderpath = 'batch-represent/data/' + person
-
+            folderpath = 'image_processing_core/batch-represent/data/' + person
+            print()
             try:
                 os.makedirs(folderpath)
             except OSError as e:
@@ -72,12 +80,24 @@ def doPreprocessing():
 
             newPath = folderpath + "/" + str(i) + ".jpg"
             preProcess(imagesPaths[i], True, newPath)
+        
+        db.update('people', "name='{0}'".format(person), 'is_preprocessed=1')
+
 
 if __name__ == '__main__':
+    db = Database()
+    db.connect_db()
+
+    # db.update('status', 'is_preprocessing=0', 'is_preprocessing=1')
+    result = db.where('people','is_preprocessed=0')
+    unpreprocessedProple = []
+    for r in result:
+        if(r[3] == 0):
+            unpreprocessedProple.append(r[1])
+
     dlibFacePredictor = os.path.join(
         dlibModelDir,
         "shape_predictor_68_face_landmarks.dat")
 
     align = openface.AlignDlib(dlibFacePredictor)
-    # preProcess('../downloads/rouhani/1.jpg',True)
-    doPreprocessing()
+    doPreprocessing(unpreprocessedProple)
