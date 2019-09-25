@@ -13,6 +13,15 @@ class Status extends Model {
         }
     }
 
+    setDate(){
+        let date =(new Date()).toString()
+        this.update('id=1',`last_vector_date='${date}'`).then(res=>{
+            console.log(res)
+        }).catch(err=>{
+            console.log(err)
+        })
+    }
+
 }
 
 module.exports = Status

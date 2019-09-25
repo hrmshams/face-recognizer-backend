@@ -56,6 +56,19 @@ class People extends Model {
         })
     }
 
+    getReadyPeople(){
+        let self = this
+
+        return new Promise (function(resolve,reject){
+            self.where(`is_crawled=1 and is_preprocessed=1`)
+        .then(res=>{
+            resolve(res)
+        }).catch(err=>{
+            reject(err)
+        })
+        })
+    }
+
 }
 
 module.exports = People
