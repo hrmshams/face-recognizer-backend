@@ -94,10 +94,37 @@ class Users extends Model {
     }
 
     getAll() {
-        const getUserIDQuery = sqlWrapper.selectQueryMaker(["username", "is_admin"], this.tableName)
-        console.log(getUserIDQuery)
+        const getUserIDQuery = sqlWrapper.selectQueryMaker(["id","username", "is_admin"], this.tableName, "id!=2")
         return new Promise(function(resolve, reject){
             DatabaseConnection.query(getUserIDQuery)
+            .then(res=>{
+                resolve(res)
+            })
+            .catch(err=>{
+                reject(err)
+            })
+        })
+    }
+
+    deleteUser(id) {
+        const deleteUserQuery = sqlWrapper.deleteQueryMaker(this.tableName, `id='${id}'`)
+        return new Promise(function(resolve, reject){
+            DatabaseConnection.query(deleteUserQuery)
+            .then(res=>{
+                resolve(res)
+            })
+            .catch(err=>{
+                reject(err)
+            })
+        })
+    }
+
+    promoteDemote(id, isPromote){
+        let is_admin = isPromote ? 1:0
+
+        let self = this
+        return new Promise(function(resolve, reject){
+            self.update(`id='${id}'`, `is_admin=${is_admin}`)
             .then(res=>{
                 resolve(res)
             })

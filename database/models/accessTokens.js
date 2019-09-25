@@ -1,4 +1,6 @@
 var Model = require('./model')
+var sqlWrapper = require('./../sqlWrapper')
+var DatabaseConnection = require('./../databaseConnection')
 
 class AccessTokens extends Model {
     constructor(){
@@ -19,6 +21,20 @@ class AccessTokens extends Model {
             scope : [Model.types.varchar],
         }
     }
+
+    deleteAccessToken(id) {
+        const deleteUserQuery = sqlWrapper.deleteQueryMaker(this.tableName, `user_id='${id}'`)
+        return new Promise(function(resolve, reject){
+            DatabaseConnection.query(deleteUserQuery)
+            .then(res=>{
+                resolve(res)
+            })
+            .catch(err=>{
+                reject(err)
+            })
+        })
+    }
+
 }
 
 module.exports = AccessTokens

@@ -75,7 +75,12 @@ const selectQueryMaker = function(selectedFields, tableName, conditionStr){
     return query
 }
 
+const deleteQueryMaker = function(tableName, conditionStr){
+    return "DELETE FROM " + tableName + " WHERE " + conditionStr
+}
+
 module.exports = {
     selectQueryMaker,
-    insertQueryMaker
+    insertQueryMaker,
+    deleteQueryMaker
 }
