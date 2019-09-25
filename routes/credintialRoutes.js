@@ -1,5 +1,6 @@
 var peopleRoutes = require('./controllers/peopleController')
 var userRoutes = require('./controllers/userController')
+var preprocessRoutes = require('./controllers/preprocessController')
 var expressApp = require('./mainExpressApp').getMainExpressApp()
 
 var userScopeAuthMiddleware = require('./middlewares/authMiddlewares').userScopeAuthMiddleware
@@ -74,6 +75,7 @@ credintialRoutes.get('/getUser', function(req, res, next) {
 
 credintialRoutes.use('/people', peopleRoutes)
 credintialRoutes.use('/user', userRoutes)
+credintialRoutes.use('/preprocess', preprocessRoutes)
 
 function obtainToken(req, res) {
 	var request = new Request(req);

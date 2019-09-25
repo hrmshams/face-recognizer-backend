@@ -88,7 +88,7 @@ if __name__ == '__main__':
     db = Database()
     db.connect_db()
 
-    # db.update('status', 'is_preprocessing=0', 'is_preprocessing=1')
+    db.update('status', 'is_preprocessing=0', 'is_preprocessing=1')
     result = db.where('people','is_preprocessed=0')
     unpreprocessedProple = []
     for r in result:

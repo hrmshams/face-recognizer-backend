@@ -113,24 +113,6 @@ peopleRoutes.get('/getPeople', adminScopeAuthMiddleware, (req, res)=>{
     }).catch(function(err){
         console.log(err)
     })
-    // people.all().then(r=>{
-    //     if (r && r.length>0){
-    //         res.status(200).json({
-    //             status : 1,
-    //             people : r
-    //         })
-    //     }else{
-    //         res.status(200).json({
-    //             status : 0,
-    //             msg : 'there is no record!'
-    //         })
-    //     }
-    // }).catch(e =>{
-    //     res.status(200).json({
-    //         status : -1,
-    //         msg : "some error in server" + e
-    //     })
-    // })
 })
 
 

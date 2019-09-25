@@ -44,6 +44,18 @@ class People extends Model {
         })
     }
 
+    getUnpreprocessPeople(is_preprocessed) {
+        let self = this
+        return new Promise (function(resolve,reject){
+            self.where(`is_preprocessed='${is_preprocessed}'`)
+        .then(res=>{
+            resolve(res)
+        }).catch(err=>{
+            reject(err)
+        })
+        })
+    }
+
 }
 
 module.exports = People
