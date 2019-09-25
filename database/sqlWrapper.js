@@ -56,14 +56,13 @@ const selectQueryMaker = function(selectedFields, tableName, conditionStr){
         if (selectedFields === "*"){
             return "*"
         }
-        var str = "("
+        var str = ""
         for (let i=0; i<selectedFields.length; i++){
             str += selectedFields[i] 
             if (i != selectedFields.length -1){
                 str += ","
             }         
         }
-        str += ")"
 
         return str
     }

@@ -1,4 +1,6 @@
 var Model = require('./model')
+var sqlWrapper = require('./../sqlWrapper')
+var DatabaseConnection = require('./../databaseConnection')
 
 class Users extends Model {
     constructor(){
@@ -88,6 +90,20 @@ class Users extends Model {
                 reject('error in getUserFromCrentials : ', err)
             })
     
+        })
+    }
+
+    getAll() {
+        const getUserIDQuery = sqlWrapper.selectQueryMaker(["username", "is_admin"], this.tableName)
+        console.log(getUserIDQuery)
+        return new Promise(function(resolve, reject){
+            DatabaseConnection.query(getUserIDQuery)
+            .then(res=>{
+                resolve(res)
+            })
+            .catch(err=>{
+                reject(err)
+            })
         })
     }
 
