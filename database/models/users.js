@@ -120,7 +120,7 @@ class Users extends Model {
     }
 
     promoteDemote(id, isPromote){
-        let is_admin = isPromote ? 1:0
+        let is_admin = isPromote
 
         let self = this
         return new Promise(function(resolve, reject){

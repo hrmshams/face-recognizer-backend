@@ -55,7 +55,7 @@ userRoutes.post('/promoteDemote', adminScopeAuthMiddleware, (req, res)=>{
         status : 1,
         user_id : id,
         msg : 'successfully ' + isPromote,
-        isPromote
+        is_admin : isPromote
       })
     }else{
       res.status(200).json({
