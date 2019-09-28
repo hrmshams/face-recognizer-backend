@@ -1,0 +1,1 @@
+python3 classifier.py infer ./batch-represent/models/openface/celeb-classifier.nn4.small2.v1.pkl ./tr.jpg

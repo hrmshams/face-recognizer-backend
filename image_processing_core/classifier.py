@@ -84,23 +84,24 @@ def preProcess(imgPath, saves):
     return alignedFace
 
 
-def train(args):
+def train(workDir, classifier="LinearSvm", ldaDim=-1):
     print("Loading embeddings.")
-    fname = "{}/labels.csv".format(args.workDir)
+    fname = "{}/labels.csv".format(workDir)
     labels = pd.read_csv(fname, header=None).as_matrix()[:, 1]
-    labels = map(itemgetter(1),
+    labels = list(map(itemgetter(1),
                  map(os.path.split,
-                     map(os.path.dirname, labels)))  # Get the directory.
-    fname = "{}/reps.csv".format(args.workDir)
+                     map(os.path.dirname, labels))))  # Get the directory.
+    fname = "{}/reps.csv".format(workDir)
     embeddings = pd.read_csv(fname, header=None).as_matrix()
     le = LabelEncoder().fit(labels)
     labelsNum = le.transform(labels)
+
     nClasses = len(le.classes_)
     print("Training for {} classes.".format(nClasses))
 
-    if args.classifier == 'LinearSvm':
+    if classifier == 'LinearSvm':
         clf = SVC(C=1, kernel='linear', probability=True)
-    elif args.classifier == 'GridSearchSvm':
+    elif classifier == 'GridSearchSvm':
         print("""
         Warning: In our experiences, using a grid search over SVM hyper-parameters only
         gives marginally better performance than a linear SVM with C=1 and
@@ -114,21 +115,21 @@ def train(args):
              'kernel': ['rbf']}
         ]
         clf = GridSearchCV(SVC(C=1, probability=True), param_grid, cv=5)
-    elif args.classifier == 'GMM':  # Doesn't work best
+    elif classifier == 'GMM':  # Doesn't work best
         clf = GMM(n_components=nClasses)
 
     # ref:
     # http://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html#example-classification-plot-classifier-comparison-py
-    elif args.classifier == 'RadialSvm':  # Radial Basis Function kernel
+    elif classifier == 'RadialSvm':  # Radial Basis Function kernel
         # works better with C = 1 and gamma = 2
         clf = SVC(C=1, kernel='rbf', probability=True, gamma=2)
-    elif args.classifier == 'DecisionTree':  # Doesn't work best
+    elif classifier == 'DecisionTree':  # Doesn't work best
         clf = DecisionTreeClassifier(max_depth=20)
-    elif args.classifier == 'GaussianNB':
+    elif classifier == 'GaussianNB':
         clf = GaussianNB()
 
     # ref: https://jessesw.com/Deep-Learning/
-    elif args.classifier == 'DBN':
+    elif classifier == 'DBN':
         from nolearn.dbn import DBN
         clf = DBN([embeddings.shape[1], 500, labelsNum[-1:][0] + 1],  # i/p nodes, hidden nodes, o/p nodes
                   learn_rates=0.3,
@@ -142,16 +143,16 @@ def train(args):
                   # will be randomly dropped as a decimal.
                   verbose=1)
 
-    if args.ldaDim > 0:
+    if ldaDim > 0:
         clf_final = clf
-        clf = Pipeline([('lda', LDA(n_components=args.ldaDim)),
+        clf = Pipeline([('lda', LDA(n_components=ldaDim)),
                         ('clf', clf_final)])
 
     clf.fit(embeddings, labelsNum)
 
-    fName = "{}/classifier.pkl".format(args.workDir)
+    fName = "{}/classifier.pkl".format(workDir)
     print("Saving classifier to '{}'".format(fName))
-    with open(fName, 'w') as f:
+    with open(fName, 'wb') as f:
         pickle.dump((le, clf), f)
 
 
@@ -179,91 +180,108 @@ def infer(args):
             print("  + Distance from the mean: {}".format(dist))
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser()
+#     parser = argparse.ArgumentParser()
 
-    parser.add_argument(
-        '--dlibFacePredictor',
-        type=str,
-        help="Path to dlib's face predictor.",
-        default=os.path.join(
-            dlibModelDir,
-            "shape_predictor_68_face_landmarks.dat"))
-    parser.add_argument(
-        '--networkModel',
-        type=str,
-        help="Path to Torch network model.",
-        default=os.path.join(
-            openfaceModelDir,
-            'nn4.small2.v1.t7'))
-    parser.add_argument('--imgDim', type=int,
-                        help="Default image dimension.", default=96)
-    parser.add_argument('--cuda', action='store_true')
-    parser.add_argument('--verbose', action='store_true')
+#     # parser.add_argument(
+#     #     '--dlibFacePredictor',
+#     #     type=str,
+#     #     help="Path to dlib's face predictor.",
+#     #     default=os.path.join(
+#     #         dlibModelDir,
+#     #         "shape_predictor_68_face_landmarks.dat"))
+#     parser.add_argument(
+#         '--networkModel',
+#         type=str,
+#         help="Path to Torch network model.",
+#         default=os.path.join(
+#             openfaceModelDir,
+#             'nn4.small2.v1.t7'))
+#     parser.add_argument('--imgDim', type=int,
+#                         help="Default image dimension.", default=96)
+#     parser.add_argument('--cuda', action='store_true')
+#     parser.add_argument('--verbose', action='store_true')
 
-    subparsers = parser.add_subparsers(dest='mode', help="Mode")
-    trainParser = subparsers.add_parser('train',
-                                        help="Train a new classifier.")
-    trainParser.add_argument('--ldaDim', type=int, default=-1)
-    trainParser.add_argument(
-        '--classifier',
-        type=str,
-        choices=[
-            'LinearSvm',
-            'GridSearchSvm',
-            'GMM',
-            'RadialSvm',
-            'DecisionTree',
-            'GaussianNB',
-            'DBN'],
-        help='The type of classifier to use.',
-        default='LinearSvm')
-    trainParser.add_argument(
-        'workDir',
-        type=str,
-        help="The input work directory containing 'reps.csv' and 'labels.csv'. Obtained from aligning a directory with 'align-dlib' and getting the representations with 'batch-represent'.")
+#     subparsers = parser.add_subparsers(dest='mode', help="Mode")
+#     # trainParser = subparsers.add_parser('train',
+#     #                                     help="Train a new classifier.")
+#     # trainParser.add_argument('--ldaDim', type=int, default=-1)
+#     trainParser.add_argument(
+#         '--classifier',
+#         type=str,
+#         choices=[
+#             'LinearSvm',
+#             'GridSearchSvm',
+#             'GMM',
+#             'RadialSvm',
+#             'DecisionTree',
+#             'GaussianNB',
+#             'DBN'],
+#         help='The type of classifier to use.',
+#         default='LinearSvm')
+#     # trainParser.add_argument(
+#     #     'workDir',
+#     #     type=str,
+#     #     help="The input work directory containing 'reps.csv' and 'labels.csv'. Obtained from aligning a directory with 'align-dlib' and getting the representations with 'batch-represent'.")
 
-    inferParser = subparsers.add_parser(
-        'infer', help='Predict who an image contains from a trained classifier.')
-    inferParser.add_argument(
-        'classifierModel',
-        type=str,
-        help='The Python pickle representing the classifier. This is NOT the Torch network model, which can be set with --networkModel.')
-    inferParser.add_argument('imgs', type=str, nargs='+',
-                             help="Input image.")
-    inferParser.add_argument('--multi', help="Infer multiple faces in image",
-                             action="store_true")
+#     inferParser = subparsers.add_parser(
+#         'infer', help='Predict who an image contains from a trained classifier.')
+#     inferParser.add_argument(
+#         'classifierModel',
+#         type=str,
+#         help='The Python pickle representing the classifier. This is NOT the Torch network model, which can be set with --networkModel.')
+#     inferParser.add_argument('imgs', type=str, nargs='+',
+#                              help="Input image.")
+#     inferParser.add_argument('--multi', help="Infer multiple faces in image",
+#                              action="store_true")
 
-    args = parser.parse_args()
-    if args.verbose:
-        print("Argument parsing and import libraries took {} seconds.".format(
-            time.time() - start))
+#     args = parser.parse_args()
+#     if args.verbose:
+#         print("Argument parsing and import libraries took {} seconds.".format(
+#             time.time() - start))
 
-    if args.mode == 'infer' and args.classifierModel.endswith(".t7"):
-        raise Exception("""
-Torch network model passed as the classification model,
-which should be a Python pickle (.pkl)
+#     if args.mode == 'infer' and args.classifierModel.endswith(".t7"):
+#         raise Exception("""
+# Torch network model passed as the classification model,
+# which should be a Python pickle (.pkl)
 
-See the documentation for the distinction between the Torch
-network and classification models:
+# See the documentation for the distinction between the Torch
+# network and classification models:
 
-        http://cmusatyalab.github.io/openface/demo-3-classifier/
-        http://cmusatyalab.github.io/openface/training-new-models/
+#         http://cmusatyalab.github.io/openface/demo-3-classifier/
+#         http://cmusatyalab.github.io/openface/training-new-models/
 
-Use `--networkModel` to set a non-standard Torch network model.""")
-    start = time.time()
+# Use `--networkModel` to set a non-standard Torch network model.""")
+#     start = time.time()
 
-    align = openface.AlignDlib(args.dlibFacePredictor)
-    net = openface.TorchNeuralNet(args.networkModel, imgDim=args.imgDim,
-                                  cuda=args.cuda)
+#     align = openface.AlignDlib(args.dlibFacePredictor)
+#     net = openface.TorchNeuralNet(args.networkModel, imgDim=args.imgDim,
+#                                   cuda=args.cuda)
 
-    if args.verbose:
-        print("Loading the dlib and OpenFace models took {} seconds.".format(
-            time.time() - start))
-        start = time.time()
+#     if args.verbose:
+#         print("Loading the dlib and OpenFace models took {} seconds.".format(
+#             time.time() - start))
+#         start = time.time()
 
-    if args.mode == 'train':
-        train(args)
-    elif args.mode == 'infer':
-        infer(args)
+#     if args.mode == 'train':
+#         train(args)
+#     elif args.mode == 'infer':
+#         infer(args)
+
+if __name__ == "__main__":
+
+    mode = 'infer'
+    try:
+        mode = sys.argv[1]
+    except:
+        mode = 'infer'
+
+    if mode == 'train':
+        train(fileDir + '/batch-represent/reps')
+    elif mode == 'infer':
+        pass
+        # infer(args)
+    else:
+        print("bad mode")
+
