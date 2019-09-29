@@ -4,19 +4,32 @@ var userScopeAuthMiddleware = require('./../middlewares/authMiddlewares').userSc
 var adminScopeAuthMiddleware = require('./../middlewares/authMiddlewares').adminScopeAuthMiddleware
 
 const multer = require('multer');
-const upload = multer({dest: __dirname + '/uploads'});
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads')
+  },
+  filename: function (req, file, cb) {
+    const name = req.appendedToken.user.username + '.jpg'
+    cb(null, name)
+  }
+})
+
+const upload = multer({storage});
 var users = new (require('../../database/models/users'))()
 var accessTokens = new (require('../../database/models/accessTokens'))()
 
 userRoutes.post('/upload', userScopeAuthMiddleware, 
-upload.single('photo'), 
+upload.single('file'),
 (req, res)=>{
-     if(req.file) {
-          res.json(req.file);
-     }
-     else {
-          res.json({status : -1, msg : "couldn't upload file"})
-     }
+      if(req.file) {
+        res.json({
+          status : 1,
+          details : req.file
+        });
+      }
+      else {
+        res.json({status : -1, msg : "couldn't upload file"})
+      }
 })
 
 userRoutes.get('/getAll', adminScopeAuthMiddleware, (req, res)=>{

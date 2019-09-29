@@ -2,6 +2,8 @@ var peopleRoutes = require('./controllers/peopleController')
 var userRoutes = require('./controllers/userController')
 var preprocessRoutes = require('./controllers/preprocessController')
 var featureVectorRoutes = require('./controllers/featureVectorController')
+var trainRoutes = require('./controllers/trainController')
+
 var expressApp = require('./mainExpressApp').getMainExpressApp()
 
 var userScopeAuthMiddleware = require('./middlewares/authMiddlewares').userScopeAuthMiddleware
@@ -78,6 +80,7 @@ credintialRoutes.use('/people', peopleRoutes)
 credintialRoutes.use('/user', userRoutes)
 credintialRoutes.use('/preprocess', preprocessRoutes)
 credintialRoutes.use('/featurevector', featureVectorRoutes)
+credintialRoutes.use('/train', trainRoutes)
 
 function obtainToken(req, res) {
 	var request = new Request(req);

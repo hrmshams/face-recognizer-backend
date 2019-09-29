@@ -1,5 +1,5 @@
-var AccessTokenModel = require('./../database/models/accessTokens')
-var Users = require('./../database/models/users')
+var accessTokenModel = new (require('./../database/models/accessTokens'))()
+var users = new (require('./../database/models/users'))()
 
 var config = {
 	clients: [{
@@ -32,10 +32,11 @@ module.exports = () => {
 var getAccessToken = function(bearerToken, callback) {
 
 	// console.log('getaccessToken called bearer token : ' + bearerToken)
-	let accessTokenModel = new AccessTokenModel()
 	accessTokenModel.where(`access_token='${bearerToken}'`)
 	.then(res=>{
+
 		if (res && res.length){
+
 			const token = res[0]
 			let tokenObj = {
 				accessToken: token.access_token,
@@ -45,22 +46,19 @@ var getAccessToken = function(bearerToken, callback) {
 					id: token.client_id
 				},
 				user: {
-					id : token.user_id
+					id : token.user_id,
 				}
 			}
-			callback(false, tokenObj)
+
+			users.where(`id='${token.user_id}'`).then(r=>{
+				tokenObj.user.username = r[0].username
+				callback(false, tokenObj)
+
+			}).catch(err=>{
+				console.log('error in getting username : ' + err)
+				callback(false, tokenObj)
+			})
 		}else{
-			// let tokenObj = {
-			// 	accessToken: null,
-			// 	accessTokenExpiresAt: new Date(),
-			// 	scope: -1,
-			// 	client: {
-			// 		id: null
-			// 	},
-			// 	user: {
-			// 		id : null
-			// 	}			
-			// }
 			callback(false, null)
 		}
   
@@ -86,7 +84,6 @@ var saveToken = function(token, client, user) {
 	// console.log('saveAccessToken() called and accessToken is: ', token,' and client is: ',client, ' and user is: ', user)
   
 	//save the accessToken along with the user.id
-	let accessTokenModel = new AccessTokenModel()
 	accessTokenModel.setValues([
 		user.id, 
 		token.accessToken, 
@@ -123,7 +120,6 @@ var getUser = function(username, password, callback) {
 	// console.log('getUser() called and username is :'+ username + ' and password is :'+ password);
 
 	//try and get the user using the user's credentials
-	let users = new Users()
 	users.where(`username = '${username}' AND password = SHA('${password}')`)
 	.then(res=>{
 		// console.log('successfully got the user ', res)
