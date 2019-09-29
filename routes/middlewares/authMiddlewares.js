@@ -1,46 +1,50 @@
-var expressApp = require('./../mainExpressApp').getMainExpressApp()
+var expressApp = require("./../mainExpressApp").getMainExpressApp();
 
-var OAuth2Server = require('oauth2-server'),
+var OAuth2Server = require("oauth2-server"),
     Request = OAuth2Server.Request,
     Response = OAuth2Server.Response;
 
 const userScopeAuthMiddleware = function(req, res, next) {
     var options = {
-        scope : "user",
-    }
+        scope: "user"
+    };
     var request = new Request(req);
     var response = new Response(res);
 
-    return expressApp.oauth.authenticate(request, response, options)
+    return expressApp.oauth
+        .authenticate(request, response, options)
         .then(function(token) {
-            req.appendedToken = token
-            console.log(token)
+            req.appendedToken = token;
+            console.log(token);
             next();
-        }).catch(function(err) {
-            console.log(options)
+        })
+        .catch(function(err) {
+            console.log(options);
             res.status(err.code || 500).json(err);
         });
-}
+};
 
 const adminScopeAuthMiddleware = function(req, res, next) {
     var options = {
-        scope : "user admin",
-    }
+        scope: "user admin"
+    };
     var request = new Request(req);
     var response = new Response(res);
 
-    return expressApp.oauth.authenticate(request, response, options)
+    return expressApp.oauth
+        .authenticate(request, response, options)
         .then(function(token) {
-            request.appendedToken = token
-            console.log(token)
+            request.appendedToken = token;
+            console.log(token);
             next();
-        }).catch(function(err) {
-            console.log(options)
+        })
+        .catch(function(err) {
+            console.log(options);
             res.status(err.code || 500).json(err);
         });
-}
+};
 
 module.exports = {
     userScopeAuthMiddleware,
     adminScopeAuthMiddleware
-}
+};
