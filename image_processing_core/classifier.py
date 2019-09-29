@@ -68,7 +68,7 @@ def preProcess(imgPath, saves):
     reps = []
     # for bb in bbs:
     alignedFace = align.align(
-        args.imgDim,
+        96,
         rgbImg,
         bb1,
         landmarkIndices=openface.AlignDlib.OUTER_EYES_AND_NOSE)
@@ -156,132 +156,74 @@ def train(workDir, classifier="LinearSvm", ldaDim=-1):
         pickle.dump((le, clf), f)
 
 
-def infer(args):
-    with open(args.classifierModel, 'rb') as f:
+def infer(img):
+    classifierModel = "./batch-represent/models/openface/celeb-classifier.nn4.small2.v1.pkl"
+
+    with open(classifierModel, 'rb') as f:
         if sys.version_info[0] < 3:
-                (le, clf) = pickle.load(f)
+            (le, clf) = pickle.load(f)
         else:
-                (le, clf) = pickle.load(f, encoding='latin1')
+            (le, clf) = pickle.load(f, encoding='latin1')
 
-    for img in args.imgs:
-        alignedFace = preProcess(img, False)
-        rep = net.forward(alignedFace)
+    alignedFace = preProcess(img, False)
+    rep = net.forward(alignedFace)
 
-        reshapedRep = rep.reshape(1, -1)
-        predictions = clf.predict_proba(rep).ravel()
-        maxI = np.argmax(predictions)
-        person = le.inverse_transform(maxI)
-        confidence = predictions[maxI]
+    reshapedRep = rep.reshape(1, -1)
+    predictions = clf.predict_proba(rep).ravel()
+    maxI = np.argmax(predictions)
+    person = le.inverse_transform(maxI)
+    confidence = predictions[maxI]
 
-        print("Predict {} with {:.2f} confidence.".format(person.decode('utf-8'), confidence))
+    print("Predict {} with {:.2f} confidence.".format(person.decode('utf-8'), confidence))
 
-        if isinstance(clf, GMM):
-            dist = np.linalg.norm(rep - clf.means_[maxI])
-            print("  + Distance from the mean: {}".format(dist))
+    if isinstance(clf, GMM):
+        dist = np.linalg.norm(rep - clf.means_[maxI])
+        print("  + Distance from the mean: {}".format(dist))
 
-
-# if __name__ == '__main__':
-
-#     parser = argparse.ArgumentParser()
-
-#     # parser.add_argument(
-#     #     '--dlibFacePredictor',
-#     #     type=str,
-#     #     help="Path to dlib's face predictor.",
-#     #     default=os.path.join(
-#     #         dlibModelDir,
-#     #         "shape_predictor_68_face_landmarks.dat"))
-#     parser.add_argument(
-#         '--networkModel',
-#         type=str,
-#         help="Path to Torch network model.",
-#         default=os.path.join(
-#             openfaceModelDir,
-#             'nn4.small2.v1.t7'))
-#     parser.add_argument('--imgDim', type=int,
-#                         help="Default image dimension.", default=96)
-#     parser.add_argument('--cuda', action='store_true')
-#     parser.add_argument('--verbose', action='store_true')
-
-#     subparsers = parser.add_subparsers(dest='mode', help="Mode")
-#     # trainParser = subparsers.add_parser('train',
-#     #                                     help="Train a new classifier.")
-#     # trainParser.add_argument('--ldaDim', type=int, default=-1)
-#     trainParser.add_argument(
-#         '--classifier',
-#         type=str,
-#         choices=[
-#             'LinearSvm',
-#             'GridSearchSvm',
-#             'GMM',
-#             'RadialSvm',
-#             'DecisionTree',
-#             'GaussianNB',
-#             'DBN'],
-#         help='The type of classifier to use.',
-#         default='LinearSvm')
-#     # trainParser.add_argument(
-#     #     'workDir',
-#     #     type=str,
-#     #     help="The input work directory containing 'reps.csv' and 'labels.csv'. Obtained from aligning a directory with 'align-dlib' and getting the representations with 'batch-represent'.")
-
-#     inferParser = subparsers.add_parser(
-#         'infer', help='Predict who an image contains from a trained classifier.')
-#     inferParser.add_argument(
-#         'classifierModel',
-#         type=str,
-#         help='The Python pickle representing the classifier. This is NOT the Torch network model, which can be set with --networkModel.')
-#     inferParser.add_argument('imgs', type=str, nargs='+',
-#                              help="Input image.")
-#     inferParser.add_argument('--multi', help="Infer multiple faces in image",
-#                              action="store_true")
-
-#     args = parser.parse_args()
-#     if args.verbose:
-#         print("Argument parsing and import libraries took {} seconds.".format(
-#             time.time() - start))
-
-#     if args.mode == 'infer' and args.classifierModel.endswith(".t7"):
-#         raise Exception("""
-# Torch network model passed as the classification model,
-# which should be a Python pickle (.pkl)
-
-# See the documentation for the distinction between the Torch
-# network and classification models:
-
-#         http://cmusatyalab.github.io/openface/demo-3-classifier/
-#         http://cmusatyalab.github.io/openface/training-new-models/
-
-# Use `--networkModel` to set a non-standard Torch network model.""")
-#     start = time.time()
-
-#     align = openface.AlignDlib(args.dlibFacePredictor)
-#     net = openface.TorchNeuralNet(args.networkModel, imgDim=args.imgDim,
-#                                   cuda=args.cuda)
-
-#     if args.verbose:
-#         print("Loading the dlib and OpenFace models took {} seconds.".format(
-#             time.time() - start))
-#         start = time.time()
-
-#     if args.mode == 'train':
-#         train(args)
-#     elif args.mode == 'infer':
-#         infer(args)
 
 if __name__ == "__main__":
 
-    mode = 'infer'
-    try:
-        mode = sys.argv[1]
-    except:
-        mode = 'infer'
+    parser = argparse.ArgumentParser()
 
-    if mode == 'train':
+    parser.add_argument(
+        '--dlibFacePredictor',
+        type=str,
+        help="Path to dlib's face predictor.",
+        default=os.path.join(
+            dlibModelDir,
+            "shape_predictor_68_face_landmarks.dat"))
+    parser.add_argument(
+        '--networkModel',
+        type=str,
+        help="Path to Torch network model.",
+        default=os.path.join(
+            openfaceModelDir,
+            'nn4.small2.v1.t7'))
+            
+    parser.add_argument('--cuda', action='store_true')
+
+    subparsers = parser.add_subparsers(dest='mode', help="Mode")
+    trainParser = subparsers.add_parser('train',
+                                        help="Train a new classifier.")
+
+    inferParser = subparsers.add_parser(
+        'infer', help='Predict who an image contains from a trained classifier.')
+
+    inferParser.add_argument(
+        'img',
+        type=str,
+        help="")
+
+    args = parser.parse_args()
+
+    align = openface.AlignDlib(args.dlibFacePredictor)
+    net = openface.TorchNeuralNet(args.networkModel, imgDim=96,
+                                  cuda=args.cuda)
+
+    if args.mode == 'train':
         train(fileDir + '/batch-represent/reps')
-    elif mode == 'infer':
-        pass
-        # infer(args)
+    elif args.mode == 'infer':
+        infer(args.img)
     else:
         print("bad mode")
 
