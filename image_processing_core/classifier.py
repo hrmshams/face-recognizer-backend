@@ -157,7 +157,7 @@ def train(workDir, classifier="LinearSvm", ldaDim=-1):
 
 
 def infer(img):
-    classifierModel = "./batch-represent/models/openface/celeb-classifier.nn4.small2.v1.pkl"
+    classifierModel = fileDir + "/batch-represent/models/openface/celeb-classifier.nn4.small2.v1.pkl"
 
     with open(classifierModel, 'rb') as f:
         if sys.version_info[0] < 3:
@@ -174,7 +174,8 @@ def infer(img):
     person = le.inverse_transform(maxI)
     confidence = predictions[maxI]
 
-    print("Predict {} with {:.2f} confidence.".format(person.decode('utf-8'), confidence))
+    print ("RESULT__d-prsn__" + person.decode('utf-8'))
+    print ("RESULT__d-conf__{:.2f}".format(confidence))
 
     if isinstance(clf, GMM):
         dist = np.linalg.norm(rep - clf.means_[maxI])
