@@ -174,8 +174,7 @@ def infer(img):
     person = le.inverse_transform(maxI)
     confidence = predictions[maxI]
 
-    print ("RESULT__d-prsn__" + person.decode('utf-8'))
-    print ("RESULT__d-conf__{:.2f}".format(confidence))
+    print ("RESULT__d-prsn__" + person.decode('utf-8') + "__d-conf__{:.2f}".format(confidence))
 
     if isinstance(clf, GMM):
         dist = np.linalg.norm(rep - clf.means_[maxI])

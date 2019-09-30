@@ -87,14 +87,12 @@ faceDetectRoutes.post("/start", userScopeAuthMiddleware, (req, res) => {
     var pyshell = new PythonShell(preProcessPythonScript, options)
     pyshell.on("message", function(message) {
         msg = message.split("__")
-        if (msg[1] === "d-prsn")
-            upload_status.update(`user_id='${user_id}'`, `p_person='${msg[2]}'`)
-        if (msg[1] === "d-conf")
+        if (msg[1] === "d-prsn" && msg[3] === "d-conf") {
             upload_status.update(
                 `user_id='${user_id}'`,
-                `confidence='${msg[2]}'`
+                `p_person='${msg[2]}', confidence='${msg[4]}'`
             )
-
+        }
         console.log(msg)
     })
 
@@ -119,5 +117,24 @@ faceDetectRoutes.post("/start", userScopeAuthMiddleware, (req, res) => {
             "running the classifier for detection script is successfully started"
     })
 })
+
+faceDetectRoutes.get(
+    "/getComparingProcessInfo",
+    userScopeAuthMiddleware,
+    (req, res) => {
+        const username = req.appendedToken.user.username
+        const user_id = req.appendedToken.user.id
+
+        upload_status
+            .where(`user_id='${user_id}'`)
+            .then(r => {
+                res.status(200).json(r[0])
+                console.log(r)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
+)
 
 module.exports = faceDetectRoutes
