@@ -1,6 +1,8 @@
 var express = require("express")
 var faceDetectRoutes = express()
 
+var fileExists = require("./../utils")
+
 var userScopeAuthMiddleware = require("./../middlewares/authMiddlewares")
     .userScopeAuthMiddleware
 
@@ -14,6 +16,9 @@ var storage = multer.diskStorage({
         cb(null, name)
     }
 })
+
+var fs = require("fs")
+var path = require("path")
 
 /** related to crawling python script **/
 var pythonAddress = require("./../../image_processing_core/addGetter")
@@ -136,5 +141,74 @@ faceDetectRoutes.get(
             })
     }
 )
+
+var myPythonScriptPath = pythonAddress() + "/getImageFromGoogle.py"
+var { PythonShell } = require("python-shell")
+
+faceDetectRoutes.get("/getImage", userScopeAuthMiddleware, async function(
+    req,
+    res
+) {
+    const { name } = req.body
+
+    let probableFilePath =
+        __dirname + "/../../singleDownload/" + name + "/1.jpg"
+
+    let r = await fileExists(probableFilePath)
+    if (r === 1) {
+        fs.readFile(path.join(probableFilePath), function(err, data) {
+            if (err) {
+                console.log(err)
+                res.json({
+                    status: 0,
+                    msg: "couldnt get the downloaded file"
+                })
+            } else {
+                res.json({
+                    status: 1,
+                    base64: data.toString("base64")
+                })
+            }
+        })
+    } else {
+        let options = {
+            pythonPath: "/usr/bin/python3.6",
+            args: [name]
+        }
+
+        var pyshell = new PythonShell(myPythonScriptPath, options)
+        pyshell.on("message", function(message) {
+            console.log(message)
+        })
+        // end the input stream and allow the process to exit
+        pyshell.end(function(err) {
+            if (err) {
+                res.json({
+                    status: -1,
+                    msg: "python script had some problems!"
+                })
+            }
+            fs.readFile(
+                path.join(
+                    __dirname + "../../../singleDownload/" + name + "/1.jpg"
+                ),
+                function(err, data) {
+                    if (err) {
+                        console.log(err)
+                        res.json({
+                            status: 0,
+                            msg: "couldnt get the downloaded file"
+                        })
+                    } else {
+                        res.json({
+                            status: 1,
+                            base64: data.toString("base64")
+                        })
+                    }
+                }
+            )
+        })
+    }
+})
 
 module.exports = faceDetectRoutes
