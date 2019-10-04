@@ -145,10 +145,11 @@ faceDetectRoutes.get(
 var myPythonScriptPath = pythonAddress() + "/getImageFromGoogle.py"
 var { PythonShell } = require("python-shell")
 
-faceDetectRoutes.get("/getImage", userScopeAuthMiddleware, async function(
+faceDetectRoutes.post("/getImage", userScopeAuthMiddleware, async function(
     req,
     res
 ) {
+    console.log(req.body)
     const { name } = req.body
 
     let probableFilePath =
@@ -166,7 +167,7 @@ faceDetectRoutes.get("/getImage", userScopeAuthMiddleware, async function(
             } else {
                 res.json({
                     status: 1,
-                    base64: data.toString("base64")
+                    base64: "data:image/jpeg;base64, " + data.toString("base64")
                 })
             }
         })
@@ -202,7 +203,9 @@ faceDetectRoutes.get("/getImage", userScopeAuthMiddleware, async function(
                     } else {
                         res.json({
                             status: 1,
-                            base64: data.toString("base64")
+                            base64:
+                                "data:image/jpeg;base64, " +
+                                data.toString("base64")
                         })
                     }
                 }
