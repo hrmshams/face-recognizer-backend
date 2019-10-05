@@ -133,6 +133,8 @@ faceDetectRoutes.get(
         upload_status
             .where(`user_id='${user_id}'`)
             .then(r => {
+                console.log(r[0])
+
                 res.status(200).json(r[0])
                 console.log(r)
             })

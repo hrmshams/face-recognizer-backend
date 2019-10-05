@@ -22,6 +22,8 @@ import time
 
 start = time.time()
 
+from Database import Database
+
 import argparse
 import cv2
 import os
@@ -157,7 +159,14 @@ def train(workDir, classifier="LinearSvm", ldaDim=-1):
 
 
 def infer(img):
-    classifierModel = fileDir + "/batch-represent/models/openface/celeb-classifier.nn4.small2.v1.pkl"
+    db = Database()
+    db.connect_db()
+
+    result = db.where('status', 'is_my_model=0')
+    if (len(result) > 0):
+        classifierModel = fileDir + "/batch-represent/models/openface/celeb-classifier.nn4.small2.v1.pkl"
+    else:
+        classifierModel = fileDir + "/batch-represent/reps/classifier.pkl"
 
     with open(classifierModel, 'rb') as f:
         if sys.version_info[0] < 3:

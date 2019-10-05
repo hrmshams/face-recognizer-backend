@@ -62,5 +62,89 @@ trainRoutes.get("/getInfo", adminScopeAuthMiddleware, (req, res) => {
             })
         })
 })
+const fs = require("fs")
+const imageProcessingPath = require("./../../image_processing_core/addGetter")
+trainRoutes.post("/setModel", adminScopeAuthMiddleware, (req, res) => {
+    const { is_my_model } = req.body
+
+    if (is_my_model == 1) {
+        const myModelPath =
+            imageProcessingPath() + "/batch-represent/reps/classifier.pkl"
+
+        fs.access(myModelPath, fs.F_OK, err => {
+            if (err) {
+                console.error(err)
+
+                status
+                    .update("id=1", "is_my_model=0")
+                    .then(r => {
+                        res.json({
+                            status: 0,
+                            msg: "custom model doesn't exist, changed to 0",
+                            is_my_model: 0
+                        })
+                    })
+                    .catch(err => {
+                        res.json({
+                            status: -1,
+                            msg:
+                                "custom model doesn't exist and couldn't change : " +
+                                err
+                        })
+                    })
+
+                return
+            }
+
+            status
+                .update("id=1", `is_my_model=${is_my_model}`)
+                .then(r => {
+                    res.json({
+                        status: 1,
+                        is_my_model,
+                        msg: "custom model is set"
+                    })
+                })
+                .catch(err => {
+                    res.json({
+                        status: -1,
+                        msg: "couldn't change : " + err
+                    })
+                })
+        })
+    } else {
+        status
+            .update("id=1", `is_my_model=${is_my_model}`)
+            .then(r => {
+                res.json({
+                    status: 1,
+                    is_my_model,
+                    msg: "pre model is set"
+                })
+            })
+            .catch(err => {
+                res.json({
+                    status: -1,
+                    msg: "couldn't change : " + err
+                })
+            })
+    }
+})
+
+trainRoutes.get("/getWholeStatus", adminScopeAuthMiddleware, (req, res) => {
+    status
+        .all()
+        .then(r => {
+            res.json({
+                status: 1,
+                data: { ...r[0] }
+            })
+        })
+        .catch(err => {
+            res.json({
+                status: -1
+            })
+        })
+})
 
 module.exports = trainRoutes
