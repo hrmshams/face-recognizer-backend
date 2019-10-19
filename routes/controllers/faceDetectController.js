@@ -91,14 +91,17 @@ faceDetectRoutes.post("/start", userScopeAuthMiddleware, (req, res) => {
 
     var pyshell = new PythonShell(preProcessPythonScript, options)
     pyshell.on("message", function(message) {
-        msg = message.split("__")
-        if (msg[1] === "d-prsn" && msg[3] === "d-conf") {
-            upload_status.update(
-                `user_id='${user_id}'`,
-                `p_person='${msg[2]}', confidence='${msg[4]}'`
-            )
-        }
-        console.log(msg)
+        // console.log(message.slice(0, 5))
+        if (message.slice(0, 6) === "RESULT") {
+            msg = message.split("__")
+            if (msg[1] === "d-prsn" && msg[3] === "d-conf") {
+                upload_status.update(
+                    `user_id='${user_id}'`,
+                    `p_person='${msg[2]}', confidence='${msg[4]}'`
+                )
+            }
+            console.log(msg)
+        } else console.log(message)
     })
 
     // end the input stream and allow the process to exit

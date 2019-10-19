@@ -14,7 +14,8 @@ function M.parse(arg)
    cmd:text('Options:')
 
    ------------ General options --------------------
-   cmd:option('-outDir', './../reps/', 'Subdirectory to output the representations')
+   -- cmd:option('-outDir', './../reps/', 'Subdirectory to output the representations')
+   cmd:option('-outDir', './image_processing_core/batch-represent/reps/', 'Subdirectory to output the representations')
    cmd:option('-data',
                -- paths.concat(script_path(), '..', 'data', 'lfw', 'dlib-affine-sz:96'),
                paths.concat(script_path(), '..', 'data'),
