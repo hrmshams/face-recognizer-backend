@@ -49,6 +49,8 @@ from sklearn.mixture import GMM
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 
+import subprocess
+
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, 'batch-represent', 'models')
 dlibModelDir = os.path.join(modelDir, 'dlib')
@@ -81,7 +83,7 @@ def preProcess(imgPath, saves):
 
     if (saves):
         # todo
-        cv2.imwrite("annotated.png", alignedFace)
+        cv2.imwrite("uploads/preprocessed/0/0.jpg", alignedFace)
     
     return alignedFace
 
@@ -100,6 +102,8 @@ def train(workDir, classifier="LinearSvm", ldaDim=-1):
 
     nClasses = len(le.classes_)
     print("Training for {} classes.".format(nClasses))
+
+    print(type(embeddings[0]))
 
     if classifier == 'LinearSvm':
         clf = SVC(C=1, kernel='linear', probability=True)
@@ -158,6 +162,19 @@ def train(workDir, classifier="LinearSvm", ldaDim=-1):
         pickle.dump((le, clf), f)
 
 
+def confineVectorData(returned_output):
+    returned_output = (str(returned_output))
+    startIndex = returned_output.find('VECTOR__') + 8
+    endIndex = returned_output.find('__END') -1
+    vectorStr = returned_output[startIndex : endIndex]
+    vectorArr = vectorStr.split('|')
+    print(len(vectorArr))
+    for i in range(0,len(vectorArr)):
+        vectorArr[i] = float(vectorArr[i])
+
+    return vectorArr
+
+
 def infer(img):
     db = Database()
     db.connect_db()
@@ -174,16 +191,29 @@ def infer(img):
         else:
             (le, clf) = pickle.load(f, encoding='latin1')
 
-    alignedFace = preProcess(img, False)
-    rep = net.forward(alignedFace)
+    alignedFace = preProcess(img, True)
+    
+    scriptPath = '/home/hamid/CP/final project/faceRecognition-backend/image_processing_core/batch-represent/src/main.lua'
+    dataPath = '/home/hamid/CP/final project/faceRecognition-backend/uploads/preprocessed'
+    returned_output = subprocess.check_output(['luajit', scriptPath , '-outDir', 'out', '-data', dataPath, '-infer'])
 
-    reshapedRep = rep.reshape(1, -1)
+    rep = confineVectorData(returned_output)
+    rep = np.asarray(rep, dtype=np.float32)
+
+    # rep = net.forward(alignedFace)
+    # # TODO what is it for?
+    # reshapedRep = rep.reshape(1, -1)
+
+    print(rep)
+
+
     predictions = clf.predict_proba(rep).ravel()
     maxI = np.argmax(predictions)
     person = le.inverse_transform(maxI)
     confidence = predictions[maxI]
 
-    print ("RESULT__d-prsn__" + person.decode('utf-8') + "__d-conf__{:.2f}".format(confidence))
+    # print ("RESULT__d-prsn__" + person.decode('utf-8') + "__d-conf__{:.2f}".format(confidence))
+    print ("RESULT__d-prsn__" + person + "__d-conf__{:.2f}".format(confidence))
 
     if isinstance(clf, GMM):
         dist = np.linalg.norm(rep - clf.means_[maxI])
