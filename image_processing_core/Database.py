@@ -132,7 +132,22 @@ class Database:
 
     def update(self, table_name, condition, new_value):
         query = "UPDATE {0} SET {1} WHERE {2};".format(table_name,new_value,condition)
-        print (query)
+        cursor = self.__cnx.cursor()    
+
+        try:
+            result = cursor.execute(query)
+            self.__cnx.commit()
+            cursor.close()
+            return result
+        except Exception as e:
+            cursor.close()
+            print("PRINT_couldn't exec query")
+            print("PRINT_"+e.with_traceback())
+            return -1
+
+
+    def delete(self, table_name, condition):
+        query = "DELETE FROM {0} WHERE {1};".format(table_name,condition)
         cursor = self.__cnx.cursor()    
 
         try:

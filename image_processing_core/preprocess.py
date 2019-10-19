@@ -15,14 +15,18 @@ imgDim = 96
 def preProcess(imgPath, saves=False, pathToSave=""):
     bgrImg = cv2.imread(imgPath)
     if bgrImg is None:
-        raise Exception("Unable to load image: {}".format(imgPath))
+        print ("ERR_Unable to load image: {}".format(imgPath))
+        return -1
+        # raise Exception("Unable to load image: {}".format(imgPath))
 
     rgbImg = cv2.cvtColor(bgrImg, cv2.COLOR_BGR2RGB)
 
     bb1 = align.getLargestFaceBoundingBox(rgbImg)
 
     if bb1 == None:
-        raise Exception("Unable to find a face: {}".format(imgPath))
+        print ("ERR_Unable to find a face: {}".format(imgPath))
+        return -1
+        # raise Exception("Unable to find a face: {}".format(imgPath))
         # TODO return a proper value
 
     reps = []
@@ -34,14 +38,16 @@ def preProcess(imgPath, saves=False, pathToSave=""):
         landmarkIndices=openface.AlignDlib.OUTER_EYES_AND_NOSE)
 
     if alignedFace is None:
-        raise Exception("Unable to align image: {}".format(imgPath))
+        print ("ERR_Unable to align image: {}".format(imgPath))
+        return -1
+        # raise Exception("Unable to align image: {}".format(imgPath))
         # TODO return a proper value
 
     if (saves):
         cv2.imwrite(pathToSave, alignedFace)
 
     
-    return alignedFace
+    return 1
 
 def createPaths(people):
     prefix = 'downloads'
@@ -68,9 +74,11 @@ def doPreprocessing(unpreprocessedProple):
     paths = createPaths(unpreprocessedProple)
     for person in paths:
         imagesPaths = paths[person]
+        results = []
+        folderpath = ""
         for i in range(0, len(imagesPaths)):
+            results.append('')
             folderpath = 'image_processing_core/batch-represent/data/' + person
-            print()
             try:
                 os.makedirs(folderpath)
             except OSError as e:
@@ -79,10 +87,24 @@ def doPreprocessing(unpreprocessedProple):
                 print ("Successfully created the directory %s " % folderpath)
 
             newPath = folderpath + "/" + str(i) + ".jpg"
-            preProcess(imagesPaths[i], True, newPath)
-        
-        db.update('people', "name='{0}'".format(person), 'is_preprocessed=1')
+            r = preProcess(imagesPaths[i], True, newPath)
 
+            results[i] = r
+
+        # print (results)
+        # print (list(filter(lambda x : x == -1, results)))
+        # return
+        if (len(list(filter(lambda x : x == -1, results))) == len(imagesPaths)):
+            print('TODO delete the person : ' + person)
+            print (folderpath)
+            deletePerson(person, folderpath)
+        else:
+            db.update('people', "name='{0}'".format(person), 'is_preprocessed=1')
+
+def deletePerson(person, path):
+    db.delete('people', "name='{0}'".format(person))
+    if (len(path) > 0):
+        os.rmdir(path)
 
 if __name__ == '__main__':
     db = Database()
