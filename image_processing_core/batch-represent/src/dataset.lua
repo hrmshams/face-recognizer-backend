@@ -81,7 +81,7 @@ function dataset:__init(...)
 
    -- argcheck
    local args =  initcheck(...)
-   print(args)
+   -- print(args)
    for k,v in pairs(args) do self[k] = v end
 
    if not self.loadSize then self.loadSize = self.sampleSize; end

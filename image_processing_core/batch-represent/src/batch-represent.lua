@@ -6,16 +6,16 @@ torch.setdefaulttensortype('torch.FloatTensor')
 
 function batchRepresent()
    local loadSize   = {3, opt.imgDim, opt.imgDim}
-   print(opt.data)
+   -- print(opt.data)
    local cacheFile = paths.concat(opt.data, 'cache.t7')
-   print('cache lotation: ', cacheFile)
+   -- print('cache lotation: ', cacheFile)
    local dumpLoader
    if paths.filep(cacheFile) then
-      print('Loading metadata from cache.')
-      print('If your dataset has changed, delete the cache file.')
+      -- print('Loading metadata from cache.')
+      -- print('If your dataset has changed, delete the cache file.')
       dumpLoader = torch.load(cacheFile)
    else
-      print('Creating metadata for cache.')
+      -- print('Creating metadata for cache.')
       dumpLoader = dataLoader{
          paths = {opt.data},
          loadSize = loadSize,
@@ -27,7 +27,7 @@ function batchRepresent()
    end
    collectgarbage()
    nImgs = dumpLoader:sizeTest()
-   print('nImgs: ', nImgs)
+   -- print('nImgs: ', nImgs)
    assert(nImgs > 0, "Failed to get nImgs")
 
    batchNumber = 0
@@ -68,10 +68,18 @@ function repBatch(paths, inputs, labels, batchSz)
       embeddings = embeddings:reshape(1, embeddings:size(1))
    end
 
-   for i=1,batchSz do
-      labelsCSV:write({labels[i], paths[i]})
-      repsCSV:write(embeddings[i]:totable())
+   if opt.infer then
+      result = ""
+      for i=1,128 do
+         result = result .. tostring(embeddings[1][i]) .. "|"
+      end
+      print("VECTOR__" .. result .. "__END" )
+   else
+      for i=1,batchSz do
+         labelsCSV:write({labels[i], paths[i]})
+         repsCSV:write(embeddings[i]:totable())
+      end
+      print(('Represent: %d/%d'):format(batchNumber, nImgs))
    end
 
-   print(('Represent: %d/%d'):format(batchNumber, nImgs))
 end
