@@ -11,7 +11,8 @@ class UploadStatus extends Model {
         return {
             user_id: [Model.types.varchar, Model.properties.notNull],
             status: [Model.types.varchar, Model.properties.notNull],
-            message: [Model.types.varchar, Model.properties.notNull]
+            p_person: [Model.types.varchar, Model.properties.notNull],
+            confidence: [Model.types.varchar, Model.properties.notNull]
         }
     }
 
@@ -30,7 +31,7 @@ class UploadStatus extends Model {
         let self = this
 
         return new Promise(function(resolve, reject) {
-            self.setValues([user_id, "nothing", ""])
+            self.setValues([user_id, "nothing", "", ""])
             self.save(false)
                 .then(res => {
                     resolve(res)

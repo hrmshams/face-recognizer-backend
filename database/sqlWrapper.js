@@ -1,48 +1,41 @@
-const createTableQueryMaker = function(){
-}
+const createTableQueryMaker = function() {}
 
-const insertQueryMaker = function(model, onDuplicate){
-
-    let onDuplicateQuery = function(model){
-        let {fields, values} = model.getData(true)
+const insertQueryMaker = function(model, onDuplicate) {
+    let onDuplicateQuery = function(model) {
+        let { fields, values } = model.getData(true)
 
         let query = " ON DUPLICATE KEY UPDATE"
-        for (let i=0; i<fields.length; i++){
+        for (let i = 0; i < fields.length; i++) {
             query += " " + fields[i] + "=" + '"' + values[i] + '"' + ","
         }
-        query = query.substring(0, query.length - 1);
+        query = query.substring(0, query.length - 1)
         query += ";"
 
         return query
     }
 
-    let {tableName, fields, values} = model.getData(false)
+    let { tableName, fields, values } = model.getData(false)
     let query = "INSERT INTO " + tableName + " ("
 
-    for (let i=0; i<fields.length; i++){
+    for (let i = 0; i < fields.length; i++) {
         query += fields[i]
-        if (i != fields.length-1)
-            query += ", "
+        if (i != fields.length - 1) query += ", "
     }
     query += ") VALUES ("
 
-    for (let i=0; i<values.length; i++){
+    for (let i = 0; i < values.length; i++) {
         // if (typeof(values[i]) === 'string')
         //     query += '"' + values[i] + '"' + ","
         // else
         //     query += values[i].val + ","
 
-        if (values[i] && values[i].noQuote)
-            query += values[i].val + ","
-        else
-            query += '"' + values[i] + '"' + ","
-
-
+        if (values[i] && values[i].noQuote) query += values[i].val + ","
+        else query += '"' + values[i] + '"' + ","
     }
-    query = query.substring(0, query.length - 1);
+    query = query.substring(0, query.length - 1)
     query += ")"
 
-    if (onDuplicate){
+    if (onDuplicate) {
         query += onDuplicateQuery(model)
     } else {
         query += ";"
@@ -51,31 +44,37 @@ const insertQueryMaker = function(model, onDuplicate){
     return query
 }
 
-const selectQueryMaker = function(selectedFields, tableName, conditionStr){
-    createSelectedQuery = function(){
-        if (selectedFields === "*"){
+const selectQueryMaker = function(selectedFields, tableName, conditionStr) {
+    createSelectedQuery = function() {
+        if (selectedFields === "*") {
             return "*"
         }
         var str = ""
-        for (let i=0; i<selectedFields.length; i++){
-            str += selectedFields[i] 
-            if (i != selectedFields.length -1){
+        for (let i = 0; i < selectedFields.length; i++) {
+            str += selectedFields[i]
+            if (i != selectedFields.length - 1) {
                 str += ","
-            }         
+            }
         }
 
         return str
     }
     let selectedFieldsStr = createSelectedQuery(selectedFields)
 
-    let query = "SELECT " + selectedFieldsStr + " FROM " + tableName + " WHERE " + conditionStr
+    let query =
+        "SELECT " +
+        selectedFieldsStr +
+        " FROM " +
+        tableName +
+        " WHERE " +
+        conditionStr
     if (!conditionStr)
         query = "SELECT " + selectedFieldsStr + " FROM " + tableName
-    
+
     return query
 }
 
-const deleteQueryMaker = function(tableName, conditionStr){
+const deleteQueryMaker = function(tableName, conditionStr) {
     return "DELETE FROM " + tableName + " WHERE " + conditionStr
 }
 

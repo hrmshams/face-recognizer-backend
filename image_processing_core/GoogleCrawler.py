@@ -13,7 +13,7 @@ result = db.where('people', 'is_crawled=0')
 for r in result:
     arguments = {
         "keywords":r[1],
-        "limit":1,
+        "limit":5,
         "print_urls":False,
         "format": "jpg",
         "size": "medium",

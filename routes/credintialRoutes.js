@@ -111,6 +111,7 @@ function obtainToken(req, res) {
     return expressApp.oauth
         .token(request, response)
         .then(function(token) {
+            console.log(token)
             res.json(token)
         })
         .catch(function(err) {

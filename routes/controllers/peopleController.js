@@ -21,6 +21,7 @@ peopleRoutes.post(
     adminScopeAuthMiddleware,
     (req, res) => {
         let { name } = req.body
+        console.log(req.body)
         people
             .doesPersonExist(name)
             .then(r => {
@@ -63,6 +64,7 @@ peopleRoutes.post(
                 }
             })
             .catch(e => {
+                console.log("error : " + e)
                 res.status(500).json({
                     status: -1,
                     msg: "error happened in adding person2!" + e
