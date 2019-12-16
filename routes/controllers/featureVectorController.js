@@ -13,6 +13,7 @@ const { spawn } = require("child_process")
 /***************************************/
 
 featureBorderRoutes.post("/create", adminScopeAuthMiddleware, (req, res) => {
+    console.log("create vector")
     try {
         fs.unlinkSync(luaPath() + "/../data/cache.t7")
         console.log("cache.t7 is deleted succeesfully")
